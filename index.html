@@ -3,35 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Daniel Thorne — personal site">
+  <meta name="description" content="Daniel Thorne — Designer">
   <title>Daniel Thorne</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-  <header>
-    <h1>Daniel Thorne</h1>
-    <nav>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
-    </nav>
-  </header>
+<body data-mode="work">
 
-  <main>
-    <section id="about">
-      <h2>About</h2>
-      <p>Welcome. This is a placeholder — replace with your own content.</p>
-    </section>
+  <!-- Fixed chrome -->
+  <div class="chrome">
+    <div class="wordmark">DANIEL THORNE</div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-mode="work" title="Work">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="5.5" height="5.5" rx="0.5" fill="currentColor"/>
+          <rect x="8.5" y="1" width="5.5" height="5.5" rx="0.5" fill="currentColor"/>
+          <rect x="1" y="8.5" width="5.5" height="5.5" rx="0.5" fill="currentColor"/>
+          <rect x="8.5" y="8.5" width="5.5" height="5.5" rx="0.5" fill="currentColor"/>
+        </svg>
+      </button>
+      <button class="mode-btn" data-mode="personal" title="Personal">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+          <circle cx="7.5" cy="7.5" r="2" fill="currentColor"/>
+          <line x1="7.5" y1="0.5" x2="7.5" y2="2.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="7.5" y1="12.2" x2="7.5" y2="14.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="0.5" y1="7.5" x2="2.8" y2="7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="12.2" y1="7.5" x2="14.5" y2="7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="2.2" y1="2.2" x2="3.9" y2="3.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="11.1" y1="11.1" x2="12.8" y2="12.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="12.8" y1="2.2" x2="11.1" y2="3.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="3.9" y1="11.1" x2="2.2" y2="12.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
 
-    <section id="contact">
-      <h2>Contact</h2>
-      <p>Email: <a href="mailto:danielthorne3@gmail.com">danielthorne3@gmail.com</a></p>
-    </section>
-  </main>
+  <!-- Artboard -->
+  <div class="artboard-wrap" id="artboard-wrap">
+    <div class="artboard" id="artboard"></div>
+  </div>
 
-  <footer>
-    <p>&copy; 2026 Daniel Thorne</p>
-  </footer>
+  <!-- Drag hint -->
+  <div class="hint" id="hint">drag to explore</div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-frame" id="modal-frame">
+      <div class="modal-controls">
+        <button class="modal-ctrl-btn" id="modal-link-btn" title="Copy link">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+            <path d="M5 8L8 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M6.5 3.5L7.8 2.2a2 2 0 012.8 2.8L9.2 6.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6.5 9.5L5.2 10.8a2 2 0 01-2.8-2.8L3.8 6.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="modal-ctrl-btn" id="modal-close-btn" title="Close">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+            <line x1="1" y1="1" x2="10" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="10" y1="1" x2="1" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-inner" id="modal-inner"></div>
+    </div>
+  </div>
+
+  <!-- Copy toast -->
+  <div class="toast" id="toast">Link copied</div>
 
   <script src="js/main.js"></script>
+  <script src="js/annotate.js"></script>
 </body>
 </html>
