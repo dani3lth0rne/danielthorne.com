@@ -1,14 +1,25 @@
-/* ── Grid constants ── */
-const GRID_COLS = 6;     // must satisfy GRID_COLS * GRID_ROWS >= WORK.length
-const GRID_ROWS = 2;
-const COL_STEP  = 560;   // card 280 + gap 280
-const ROW_STEP  = 480;   // card 210 + gap 270
-const TILE_W    = GRID_COLS * COL_STEP;   // 3360
-const TILE_H    = GRID_ROWS * ROW_STEP;   // 960
-const TILES_X   = 9;
-const TILES_Y   = 7;
-const CANVAS_W  = TILES_X * TILE_W;       // 14400
-const CANVAS_H  = TILES_Y * TILE_H;       // 4620
+/* ── Canvas geometry ──
+   The canvas is one tile repeated TILES_X × TILES_Y. wrapEdges() teleports the
+   view by exactly one tile, so the composition MUST stay periodic over
+   TILE_W × TILE_H — that constraint drives everything below.
+
+   The tile is deliberately much larger than a viewport (≈4.5 screens wide,
+   ≈5 tall) so you have to travel a long way before anything repeats. */
+const GRID_COLS = 14;    // slot lattice inside one tile
+const GRID_ROWS = 12;
+const COL_STEP  = 460;
+const ROW_STEP  = 400;
+const TILE_W    = GRID_COLS * COL_STEP;   // 6440
+const TILE_H    = GRID_ROWS * ROW_STEP;   // 4800
+const TILES_X   = 3;     // wrapEdges needs CANVAS > 2 tiles + viewport per axis
+const TILES_Y   = 3;
+const CANVAS_W  = TILES_X * TILE_W;       // 19320
+const CANVAS_H  = TILES_Y * TILE_H;       // 14400
+
+/* Reference viewport for the "no duplicate on one screen" rule. Two cards can
+   only share a screen if they are closer than this on BOTH axes. */
+const VIEW_W = 1560;
+const VIEW_H = 1000;
 
 /* ── Project data ── */
 const WORK = [
@@ -558,31 +569,110 @@ document.addEventListener('mousemove', e => {
 
 /* ── Build artboard ── */
 
-// Local tile positions: GRID_COLS × GRID_ROWS grid — one slot per work item.
-const TILE_POSITIONS = [];
-for (let r = 0; r < GRID_ROWS; r++) {
-  for (let c = 0; c < GRID_COLS; c++) {
-    TILE_POSITIONS.push({ x: c * COL_STEP, y: r * ROW_STEP });
-  }
-}
-// Every item needs a slot; without one the tile builder throws mid-drag and the
-// canvas stops rendering. Fail loudly here instead.
-if (TILE_POSITIONS.length < WORK.length) {
-  console.error(`Grid has ${TILE_POSITIONS.length} slots but WORK has ${WORK.length} items — ` +
-                `raise GRID_COLS/GRID_ROWS and extend SLOT_DUR/SLOT_DEL.`);
+/* ── Tile composition ──
+   Cards sit on a lattice but only some slots are used: a low-frequency field
+   carves the lattice into bunches with open ground between them, so you drift
+   across a cluster of work, then empty canvas, then a different cluster.
+
+   Projects are then assigned so no two copies of the same project are ever
+   close enough to share a screen. Everything here is keyed off the slot's
+   position in the tile (never the project index), so the whole tile stays
+   periodic and the edge teleport remains invisible. */
+
+// Deterministic 0..1 hash, so every load composes the identical canvas.
+function hash2(x, y) {
+  const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453123;
+  return s - Math.floor(s);
 }
 
-// Per-slot jitter — seed is item index only, so every tile copy has the same offset.
-// This makes the canvas visually periodic (repeats every TILE_W × TILE_H),
-// enabling seamless teleportation at edges.
-function slotJitter(idx, range) {
-  const s = Math.sin(idx * 127.1 + 311.7) * 43758.5453123;
-  return (s - Math.floor(s) - 0.5) * 2 * range;
+// Tile-periodic: each term completes a whole number of cycles across the tile.
+function clusterField(c, r) {
+  const u = c / GRID_COLS, v = r / GRID_ROWS;
+  return Math.sin(2 * Math.PI * u + 0.7) * 0.60
+       + Math.sin(2 * Math.PI * v + 2.1) * 0.60
+       + Math.sin(2 * Math.PI * (u + v) * 2 + 1.3) * 0.50
+       + Math.sin(2 * Math.PI * (u - v) * 3 + 0.2) * 0.35;
 }
-const SLOT_JX  = WORK.map((_, i) => slotJitter(i,      48));
-const SLOT_JY  = WORK.map((_, i) => slotJitter(i + 50, 36));
-const SLOT_DUR = [7.2, 9.1, 6.8, 8.6, 7.9, 8.3, 6.5, 9.4, 7.6, 8.9, 7.0, 9.7]; // per slot
-const SLOT_DEL = [0,   1.6, 3.1, 0.8, 4.2, 2.2, 1.1, 3.7, 2.6, 0.4, 3.4, 1.9]; // per slot
+
+const CLUSTER_THRESHOLD = -0.62;   // lower = more candidate slots per bunch
+
+/* You cannot show N distinct projects on a screen that holds more than N cards,
+   so cap how many cards may ever co-occur. Keeping this below WORK.length is
+   what makes "never the same project twice on screen" achievable at all. */
+const MAX_ON_SCREEN = Math.max(3, WORK.length - 1);
+
+// Toroidal separation in slots — the tile wraps, so column 0 neighbours column 13.
+const dCol = (a, b) => { const d = Math.abs(a - b); return Math.min(d, GRID_COLS - d); };
+const dRow = (a, b) => { const d = Math.abs(a - b); return Math.min(d, GRID_ROWS - d); };
+
+// Two slots can share a screen only if they are within a viewport on BOTH axes.
+const coVisible = (a, b) =>
+  dCol(a.c, b.c) * COL_STEP < VIEW_W && dRow(a.r, b.r) * ROW_STEP < VIEW_H;
+
+function composeTile() {
+  // 1. Candidate slots — the bunches carved out by the cluster field.
+  const candidates = [];
+  for (let r = 0; r < GRID_ROWS; r++) {
+    for (let c = 0; c < GRID_COLS; c++) {
+      if (clusterField(c, r) >= CLUSTER_THRESHOLD) candidates.push({ c, r });
+    }
+  }
+  // Consider them in a fixed scrambled order so thinning isn't biased by position.
+  candidates.sort((a, b) => hash2(a.c + 3, a.r + 7) - hash2(b.c + 3, b.r + 7));
+
+  // 2. Thin over-dense pockets so no viewport can ever hold more than
+  //    MAX_ON_SCREEN cards. This is what keeps the assignment in step 4
+  //    satisfiable — without it, a screen can hold more cards than there are
+  //    projects and duplicates become unavoidable.
+  const slots = [];
+  for (const { c, r } of candidates) {
+    const here = { c, r };
+    if (slots.filter(o => coVisible(here, o)).length >= MAX_ON_SCREEN) continue;
+    slots.push(Object.assign(here, {
+      x: c * COL_STEP + (hash2(c, r)      - 0.5) * 150,   // break up the lattice
+      y: r * ROW_STEP + (hash2(c + 91, r) - 0.5) * 80,
+      dur:   6.4 + hash2(c + 17, r + 5) * 3.4,
+      delay:       hash2(c + 43, r + 9) * 4.5,
+      project: -1
+    }));
+  }
+
+  // 3. Gaps are good, blank screens are not. If a slot has no card within one
+  //    step in any direction, a viewport could sit there and show nothing —
+  //    so seed one card back in.
+  for (let r = 0; r < GRID_ROWS; r++) {
+    for (let c = 0; c < GRID_COLS; c++) {
+      const here = { c, r };
+      if (slots.some(o => dCol(c, o.c) <= 1 && dRow(r, o.r) <= 1)) continue;
+      slots.push(Object.assign(here, {
+        x: c * COL_STEP + (hash2(c, r)      - 0.5) * 150,
+        y: r * ROW_STEP + (hash2(c + 91, r) - 0.5) * 80,
+        dur:   6.4 + hash2(c + 17, r + 5) * 3.4,
+        delay:       hash2(c + 43, r + 9) * 4.5,
+        project: -1
+      }));
+    }
+  }
+
+  // 4. Assign projects: never repeat within a screen, then even out usage.
+  const used = new Array(WORK.length).fill(0);
+  slots.forEach((slot, i) => {
+    const neighbours = slots.filter(o => o.project >= 0 && coVisible(slot, o));
+    let best = 0, bestScore = Infinity;
+    for (let p = 0; p < WORK.length; p++) {
+      const clashes = neighbours.reduce((n, o) => n + (o.project === p ? 1 : 0), 0);
+      const score = clashes * 1000 + used[p] * 10 + hash2(i, p);
+      if (score < bestScore) { bestScore = score; best = p; }
+    }
+    slot.project = best;
+    used[best]++;
+  });
+  return slots;
+}
+
+const TILE_SLOTS = composeTile();
+
+if (!WORK.length) console.error('WORK is empty — the canvas will render nothing.');
 
 function makeAura(src) {
   const aura = document.createElement('div');
@@ -593,10 +683,10 @@ function makeAura(src) {
   return aura;
 }
 
-function makeWorkItem(project, absX, absY, idx) {
+function makeWorkItem(project, absX, absY, slot) {
   const el = document.createElement('div');
   el.className = 'artboard-item mode-work';
-  el.style.cssText = `left:${absX}px; top:${absY}px; --float-dur:${SLOT_DUR[idx]}s; --float-delay:${SLOT_DEL[idx]}s;`;
+  el.style.cssText = `left:${absX}px; top:${absY}px; --float-dur:${slot.dur}s; --float-delay:${slot.delay}s;`;
 
   const card = document.createElement('div');
   card.className = 'item-card';
@@ -667,20 +757,21 @@ function buildArtboard() {
     for (let col = 0; col < TILES_X; col++) {
       const ox = col * TILE_W;
       const oy = row * TILE_H;
-      WORK.forEach((project, idx) => {
-        const { x: lx, y: ly } = TILE_POSITIONS[idx];
-        artboard.append(makeWorkItem(project, ox + lx + SLOT_JX[idx], oy + ly + SLOT_JY[idx], idx));
+      TILE_SLOTS.forEach(slot => {
+        artboard.append(
+          makeWorkItem(WORK[slot.project], ox + slot.x, oy + slot.y, slot));
       });
     }
   }
 
   // Personal items tiled the same way
+  // Spread across the whole tile so personal work isn't bunched in one corner.
   const P_POSITIONS = [
-    { x: 200,  y: 80  },
-    { x: 880,  y: 180 },
-    { x: 1280, y: 40  },
-    { x: 440,  y: 420 },
-    { x: 980,  y: 380 },
+    { x:  520, y:  380 },
+    { x: 3980, y:  940 },
+    { x: 1840, y: 2380 },
+    { x: 5460, y: 3120 },
+    { x: 2760, y: 4060 },
   ];
   for (let row = 0; row < TILES_Y; row++) {
     for (let col = 0; col < TILES_X; col++) {
