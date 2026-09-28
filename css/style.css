@@ -162,10 +162,18 @@ html, body {
 /* Phone chrome: a centred pill collides with the wordmark on a narrow screen,
    so hand it back to the flex row — name left, filter right. That keeps the
    full wordmark down to 320px instead of abbreviating it. */
-@media (max-width: 560px) {
-  .chrome     { padding: 14px 14px; }
-  .wordmark   { font-size: 9.5px; letter-spacing: 0.13em; }
-  .filter     { position: static; transform: none; padding: 3px; }
+@media (max-width: 700px) {
+  .chrome     { padding: 14px 14px; gap: 10px; }
+  /* The name yields before the filter does: if a screen is ever too narrow for
+     both, it truncates rather than shoving the pill off the edge. */
+  .wordmark   {
+    font-size: 9.5px; letter-spacing: 0.13em;
+    flex: 0 1 auto; min-width: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  /* Out of the absolutely-centred position and back into the row, so the two
+     can never sit on top of each other however narrow it gets. */
+  .filter     { position: static; transform: none; padding: 3px; flex: 0 0 auto; }
   .filter-btn { padding: 7px 10px; font-size: 9.5px; letter-spacing: 0.07em; }
 }
 
@@ -324,17 +332,29 @@ body.modal-open .artboard-wrap {
   transition: opacity 0.6s ease;
 }
 
-/* On a phone the lens is the middle of the screen, so open it up enough to hold
-   a whole card clear and fade out before the edges. */
+/* Phones get an edge vignette rather than a lens: everything in view is sharp,
+   and only the outer margin softens so the canvas feels like it continues past
+   the screen. Deliberately ignores --cx/--cy — there is no cursor to follow,
+   and letting a stray pointer position leak in is what left the whole screen
+   blurred. */
 @media (max-width: 640px) {
   .blur-overlay {
-    --lens-clear: 128px;
-    --lens-1: 180px;
-    --lens-2: 250px;
-    --lens-3: 330px;
-    --lens-4: 420px;
-    backdrop-filter: blur(42px) saturate(0.6) brightness(1.03);
-    -webkit-backdrop-filter: blur(42px) saturate(0.6) brightness(1.03);
+    backdrop-filter: blur(26px) saturate(0.72) brightness(1.02);
+    -webkit-backdrop-filter: blur(26px) saturate(0.72) brightness(1.02);
+    -webkit-mask-image: radial-gradient(
+      ellipse 96% 88% at 50% 50%,
+      transparent 0%,
+      transparent 68%,
+      rgba(0, 0, 0, 0.42) 87%,
+      black 100%
+    );
+    mask-image: radial-gradient(
+      ellipse 96% 88% at 50% 50%,
+      transparent 0%,
+      transparent 68%,
+      rgba(0, 0, 0, 0.42) 87%,
+      black 100%
+    );
   }
 }
 

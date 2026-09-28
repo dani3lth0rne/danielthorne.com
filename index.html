@@ -8,7 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <!-- ?v= is bumped whenever css/js change, so browsers (and anyone
+       who visited before a deploy) pick up the new file instead of a
+       cached one. -->
+  <link rel="stylesheet" href="css/style.css?v=2">
 </head>
 <body data-mode="work">
 
@@ -95,7 +98,7 @@
   <!-- Copy toast -->
   <div class="toast" id="toast">Link copied</div>
 
-  <script src="js/main.js"></script>
+  <script src="js/main.js?v=2"></script>
   <!-- TEMPORARY — annotate tool hidden for launch. It injects its own button,
        panel and styles, so not loading it removes it entirely.
        To restore: uncomment this one line. js/annotate.js is untouched. -->
