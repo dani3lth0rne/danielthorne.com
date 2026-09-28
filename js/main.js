@@ -9,21 +9,26 @@ const TILES_X = 3;       // wrapEdges needs CANVAS > 2 tiles + viewport per axis
 const TILES_Y = 3;
 
 /* How far a card may drift off its lattice point: enough to kill the ruled-grid
-   look, small enough that a screen still spans only WIN_COLS × WIN_ROWS slots. */
-const JITTER_X = 120;
-const JITTER_Y = 100;
-
-const CARD_W = 280, CARD_H = 210;
+   look. The actual figure is clamped per layout so drift can never eat the gap
+   between neighbours — that is what stops cards overlapping on a phone, where
+   the lattice is tight. */
+const JITTER_MAX_X = 120;
+const JITTER_MAX_Y = 100;
 
 /* Breathing room. 1 packs a screen to the full window block; higher spreads the
    lattice so fewer cards land on screen. Raising it only ever shrinks how many
-   slots a screen spans, so the no-repeat guarantee still holds. */
-const SPREAD = 1.28;
+   slots a screen spans, so the no-repeat guarantee still holds. Phones stay at
+   1 so the work sits close together and you needn't drag far to find the next. */
+const SPREAD_WIDE   = 1.28;
+const SPREAD_MOBILE = 1.0;
+const MOBILE_MAX    = 640;
 
 /* All of this is recomputed whenever the filter or the window changes, because
-   both alter how many projects there are to go round. */
+   both alter how many projects there are to go round — and the card itself
+   shrinks on a phone, so spacing has to follow it. */
 let WIN_COLS, WIN_ROWS, GRID_COLS, GRID_ROWS;
 let COL_STEP, ROW_STEP, TILE_W, TILE_H, CANVAS_W, CANVAS_H;
+let CARD_W, CARD_H, JITTER_X, JITTER_Y;
 
 const gcd = (a, b) => b ? gcd(b, a % b) : a;
 
@@ -40,6 +45,20 @@ function blockFor(n) {
 }
 
 function computeGeometry(n) {
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const mobile = vw <= MOBILE_MAX;
+
+  // A 280px card eats three quarters of a phone screen, so shrink it there.
+  CARD_W = mobile ? 190 : 280;
+  CARD_H = Math.round(CARD_W * 0.75);
+  document.documentElement.style.setProperty('--card-w', CARD_W + 'px');
+
+  const spread = mobile ? SPREAD_MOBILE : SPREAD_WIDE;
+  const gapX   = mobile ? 40 : 60;    // clear space that must survive the jitter
+  const gapY   = mobile ? 40 : 60;
+  const driftX = mobile ? 40 : JITTER_MAX_X;   // drift we want, if there is room
+  const driftY = mobile ? 60 : JITTER_MAX_Y;
+
   [WIN_COLS, WIN_ROWS] = blockFor(n);
 
   /* The pattern only lines up across the tile seam if GRID_COLS and
@@ -51,10 +70,19 @@ function computeGeometry(n) {
   GRID_ROWS = rowStep * Math.ceil(8 / rowStep);
 
   /* Spacing comes from the window, not a constant, so a screen spans the same
-     block on a laptop and on a 27" display. A fixed lattice fits ~20 cards on a
-     big monitor, and twelve projects cannot cover that. */
-  COL_STEP = Math.max(380, Math.ceil(SPREAD * (window.innerWidth  + CARD_W + JITTER_X) / WIN_COLS));
-  ROW_STEP = Math.max(320, Math.ceil(SPREAD * (window.innerHeight + CARD_H + JITTER_Y) / WIN_ROWS));
+     block on a phone, a laptop and a 27" display. The floor keeps room for the
+     card, its clear space and the drift; raising a step only shrinks the span,
+     so the no-repeat guarantee survives either way. */
+  COL_STEP = Math.max(CARD_W + gapX + driftX,
+                      Math.ceil(spread * (vw + CARD_W + JITTER_MAX_X) / WIN_COLS));
+  ROW_STEP = Math.max(CARD_H + gapY + driftY,
+                      Math.ceil(spread * (vh + CARD_H + JITTER_MAX_Y) / WIN_ROWS));
+
+  /* Two neighbours can drift towards each other by the full jitter, so the gap
+     shrinks by that much. Cap it at whatever the gap can actually spare. */
+  JITTER_X = Math.max(0, Math.min(driftX, COL_STEP - CARD_W - gapX));
+  JITTER_Y = Math.max(0, Math.min(driftY, ROW_STEP - CARD_H - gapY));
+
   TILE_W   = GRID_COLS * COL_STEP;
   TILE_H   = GRID_ROWS * ROW_STEP;
   CANVAS_W = TILES_X * TILE_W;
@@ -606,18 +634,34 @@ const hint         = document.getElementById('hint');
 const toast        = document.getElementById('toast');
 const blurOverlay  = document.getElementById('blur-overlay');
 
-/* ── Cursor lens ── */
+/* ── Cursor lens ──
+   On a pointer device the clear spot follows the cursor. On touch there is no
+   cursor, so the middle of the screen *is* the lens — you bring work into focus
+   by dragging it to the centre. Without this the whole phone screen sits
+   blurred, since mousemove never fires. */
+const FINE_POINTER = window.matchMedia('(pointer: fine)').matches;
 let lastMouseX = -600, lastMouseY = -600;
 
-document.addEventListener('mousemove', e => {
-  lastMouseX = e.clientX;
-  lastMouseY = e.clientY;
-  // Don't update the lens while dragging — it fights the pan and displaces items
-  if (!dragging) {
-    blurOverlay.style.setProperty('--cx', e.clientX + 'px');
-    blurOverlay.style.setProperty('--cy', e.clientY + 'px');
-  }
-});
+function centreLens() {
+  blurOverlay.style.setProperty('--cx', window.innerWidth  / 2 + 'px');
+  blurOverlay.style.setProperty('--cy', window.innerHeight / 2 + 'px');
+}
+
+if (FINE_POINTER) {
+  document.addEventListener('mousemove', e => {
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+    // Don't update the lens while dragging — it fights the pan and displaces items
+    if (!dragging) {
+      blurOverlay.style.setProperty('--cx', e.clientX + 'px');
+      blurOverlay.style.setProperty('--cy', e.clientY + 'px');
+    }
+  });
+} else {
+  centreLens();
+  window.addEventListener('resize', centreLens);
+  window.addEventListener('orientationchange', centreLens);
+}
 
 /* ── Build artboard ── */
 

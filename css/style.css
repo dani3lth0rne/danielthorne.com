@@ -159,8 +159,14 @@ html, body {
   opacity: 0;
 }
 
+/* Phone chrome: a centred pill collides with the wordmark on a narrow screen,
+   so hand it back to the flex row — name left, filter right. That keeps the
+   full wordmark down to 320px instead of abbreviating it. */
 @media (max-width: 560px) {
-  .filter-btn { padding: 7px 12px; font-size: 9.5px; letter-spacing: 0.1em; }
+  .chrome     { padding: 14px 14px; }
+  .wordmark   { font-size: 9.5px; letter-spacing: 0.13em; }
+  .filter     { position: static; transform: none; padding: 3px; }
+  .filter-btn { padding: 7px 10px; font-size: 9.5px; letter-spacing: 0.07em; }
 }
 
 /* TEMPORARY — work/personal toggle hidden for launch.
@@ -295,25 +301,41 @@ body.modal-open .artboard-wrap {
   pointer-events: none;
   backdrop-filter: blur(80px) saturate(0.55) brightness(1.04);
   -webkit-backdrop-filter: blur(80px) saturate(0.55) brightness(1.04);
+  /* Falls back to the middle of the screen, which is where touch devices keep
+     it — they have no cursor to follow. */
   -webkit-mask-image: radial-gradient(
-    circle at var(--cx, -600px) var(--cy, -600px),
+    circle at var(--cx, 50%) var(--cy, 50%),
     transparent 0px,
-    transparent 90px,
-    rgba(0,0,0,0.08) 150px,
-    rgba(0,0,0,0.38) 240px,
-    rgba(0,0,0,0.78) 360px,
-    black 480px
+    transparent var(--lens-clear, 90px),
+    rgba(0,0,0,0.08) var(--lens-1, 150px),
+    rgba(0,0,0,0.38) var(--lens-2, 240px),
+    rgba(0,0,0,0.78) var(--lens-3, 360px),
+    black var(--lens-4, 480px)
   );
   mask-image: radial-gradient(
-    circle at var(--cx, -600px) var(--cy, -600px),
+    circle at var(--cx, 50%) var(--cy, 50%),
     transparent 0px,
-    transparent 90px,
-    rgba(0,0,0,0.08) 150px,
-    rgba(0,0,0,0.38) 240px,
-    rgba(0,0,0,0.78) 360px,
-    black 480px
+    transparent var(--lens-clear, 90px),
+    rgba(0,0,0,0.08) var(--lens-1, 150px),
+    rgba(0,0,0,0.38) var(--lens-2, 240px),
+    rgba(0,0,0,0.78) var(--lens-3, 360px),
+    black var(--lens-4, 480px)
   );
   transition: opacity 0.6s ease;
+}
+
+/* On a phone the lens is the middle of the screen, so open it up enough to hold
+   a whole card clear and fade out before the edges. */
+@media (max-width: 640px) {
+  .blur-overlay {
+    --lens-clear: 128px;
+    --lens-1: 180px;
+    --lens-2: 250px;
+    --lens-3: 330px;
+    --lens-4: 420px;
+    backdrop-filter: blur(42px) saturate(0.6) brightness(1.03);
+    -webkit-backdrop-filter: blur(42px) saturate(0.6) brightness(1.03);
+  }
 }
 
 .blur-overlay.hidden {
@@ -340,7 +362,9 @@ body.modal-open .artboard-wrap {
 
 /* ── Work Cards (image only) ── */
 .item-card {
-  width: 280px;
+  /* Set from computeGeometry() so the layout maths and the rendered card can
+     never disagree about how wide a card is. */
+  width: var(--card-w, 280px);
   background: transparent;
   border: none;
   border-radius: 0;
