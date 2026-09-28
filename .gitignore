@@ -15,3 +15,6 @@ Thumbs.db
 # Build / deps (in case you add tooling later)
 node_modules/
 dist/
+
+# Vercel CLI link metadata
+.vercel
