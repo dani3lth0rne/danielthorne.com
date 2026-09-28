@@ -5,21 +5,46 @@
 
    The tile is deliberately much larger than a viewport (≈4.5 screens wide,
    ≈5 tall) so you have to travel a long way before anything repeats. */
-const GRID_COLS = 14;    // slot lattice inside one tile
-const GRID_ROWS = 12;
-const COL_STEP  = 460;
-const ROW_STEP  = 400;
-const TILE_W    = GRID_COLS * COL_STEP;   // 6440
-const TILE_H    = GRID_ROWS * ROW_STEP;   // 4800
+/* The largest block of slots a single screen may touch. 4 × 3 = 12 is exactly
+   the number of projects, so a screen can hold all twelve and never repeat one.
+   GRID_COLS must be a multiple of WORK.length, and WIN_COLS × GRID_ROWS too,
+   or the pattern will not line up where the tile wraps. */
+const WIN_COLS  = 4;
+const WIN_ROWS  = 3;
+const GRID_COLS = 12;    // slot lattice inside one tile
+const GRID_ROWS = 9;
 const TILES_X   = 3;     // wrapEdges needs CANVAS > 2 tiles + viewport per axis
 const TILES_Y   = 3;
-const CANVAS_W  = TILES_X * TILE_W;       // 19320
-const CANVAS_H  = TILES_Y * TILE_H;       // 14400
 
-/* Reference viewport for the "no duplicate on one screen" rule. Two cards can
-   only share a screen if they are closer than this on BOTH axes. */
-const VIEW_W = 1560;
-const VIEW_H = 1000;
+/* How far a card may drift off its lattice point: enough to kill the ruled-grid
+   look, small enough that a screen still spans only WIN_COLS × WIN_ROWS slots. */
+const JITTER_X = 120;
+const JITTER_Y = 100;
+
+const CARD_W = 280, CARD_H = 210;
+
+/* Spacing is derived from the window rather than fixed, so a screen spans the
+   same 4 × 3 block of slots on a laptop and on a 27" display. That is what
+   keeps "never two of the same project in view" true at every size instead of
+   only up to 1920px — a fixed lattice would fit 20 cards on a big monitor and
+   twelve projects cannot cover that. */
+let COL_STEP, ROW_STEP, TILE_W, TILE_H, CANVAS_W, CANVAS_H;
+
+/* Breathing room. 1 packs a screen to the full 4 × 3 block (~10 cards); higher
+   spreads the lattice so fewer land on screen. Raising it only ever shrinks how
+   many slots a screen spans, so the no-repeat guarantee still holds. */
+const SPREAD = 1.28;
+
+function computeGeometry() {
+  // A viewport spans (view + card + jitter) px; divide across the window block.
+  COL_STEP = Math.max(380, Math.ceil(SPREAD * (window.innerWidth  + CARD_W + JITTER_X) / WIN_COLS));
+  ROW_STEP = Math.max(320, Math.ceil(SPREAD * (window.innerHeight + CARD_H + JITTER_Y) / WIN_ROWS));
+  TILE_W   = GRID_COLS * COL_STEP;
+  TILE_H   = GRID_ROWS * ROW_STEP;
+  CANVAS_W = TILES_X * TILE_W;
+  CANVAS_H = TILES_Y * TILE_H;
+}
+computeGeometry();
 
 /* ── Project data ── */
 const WORK = [
@@ -570,14 +595,20 @@ document.addEventListener('mousemove', e => {
 /* ── Build artboard ── */
 
 /* ── Tile composition ──
-   Cards sit on a lattice but only some slots are used: a low-frequency field
-   carves the lattice into bunches with open ground between them, so you drift
-   across a cluster of work, then empty canvas, then a different cluster.
+   Every lattice point carries a card, so the canvas reads as evenly covered —
+   a loose grid rather than clumps. Each card is then nudged off its lattice
+   point so no ruled rows or columns line up and the whole thing scans as
+   scattered rather than laid out.
 
-   Projects are then assigned so no two copies of the same project are ever
-   close enough to share a screen. Everything here is keyed off the slot's
-   position in the tile (never the project index), so the whole tile stays
-   periodic and the edge teleport remains invisible. */
+   Which project lands where is the curated part. Walking one column to the
+   right advances the project by 1; one row down advances by WIN_COLS. So any
+   WIN_COLS × WIN_ROWS block of slots — the most a screen can ever touch —
+   holds each of the twelve projects exactly once. You are never shown the same
+   project twice, and any screenful is drawn from the whole roster.
+
+   Everything is derived from the slot's position in the tile, never from a
+   running counter, so the tile stays periodic and the edge teleport is
+   invisible. */
 
 // Deterministic 0..1 hash, so every load composes the identical canvas.
 function hash2(x, y) {
@@ -585,92 +616,41 @@ function hash2(x, y) {
   return s - Math.floor(s);
 }
 
-// Tile-periodic: each term completes a whole number of cycles across the tile.
-function clusterField(c, r) {
-  const u = c / GRID_COLS, v = r / GRID_ROWS;
-  return Math.sin(2 * Math.PI * u + 0.7) * 0.60
-       + Math.sin(2 * Math.PI * v + 2.1) * 0.60
-       + Math.sin(2 * Math.PI * (u + v) * 2 + 1.3) * 0.50
-       + Math.sin(2 * Math.PI * (u - v) * 3 + 0.2) * 0.35;
-}
-
-const CLUSTER_THRESHOLD = -0.62;   // lower = more candidate slots per bunch
-
-/* You cannot show N distinct projects on a screen that holds more than N cards,
-   so cap how many cards may ever co-occur. Keeping this below WORK.length is
-   what makes "never the same project twice on screen" achievable at all. */
-const MAX_ON_SCREEN = Math.max(3, WORK.length - 1);
-
-// Toroidal separation in slots — the tile wraps, so column 0 neighbours column 13.
-const dCol = (a, b) => { const d = Math.abs(a - b); return Math.min(d, GRID_COLS - d); };
-const dRow = (a, b) => { const d = Math.abs(a - b); return Math.min(d, GRID_ROWS - d); };
-
-// Two slots can share a screen only if they are within a viewport on BOTH axes.
-const coVisible = (a, b) =>
-  dCol(a.c, b.c) * COL_STEP < VIEW_W && dRow(a.r, b.r) * ROW_STEP < VIEW_H;
+/* Order the roster so the product/UI-UX work carries the canvas: it is two
+   thirds of the list, so it is two thirds of every screen. The four brand
+   projects are spread to the corners of the repeating block rather than left
+   in WORK order, which would band them into every third row. */
+const PROJECT_AT = [8, 0, 1, 11, 2, 9, 3, 4, 5, 6, 10, 7];
 
 function composeTile() {
-  // 1. Candidate slots — the bunches carved out by the cluster field.
-  const candidates = [];
-  for (let r = 0; r < GRID_ROWS; r++) {
-    for (let c = 0; c < GRID_COLS; c++) {
-      if (clusterField(c, r) >= CLUSTER_THRESHOLD) candidates.push({ c, r });
-    }
-  }
-  // Consider them in a fixed scrambled order so thinning isn't biased by position.
-  candidates.sort((a, b) => hash2(a.c + 3, a.r + 7) - hash2(b.c + 3, b.r + 7));
+  const N = WORK.length;
 
-  // 2. Thin over-dense pockets so no viewport can ever hold more than
-  //    MAX_ON_SCREEN cards. This is what keeps the assignment in step 4
-  //    satisfiable — without it, a screen can hold more cards than there are
-  //    projects and duplicates become unavoidable.
+  // The guarantee rests on these; if the roster changes, say so out loud.
+  if (WIN_COLS * WIN_ROWS > N)
+    console.warn(`A screen can touch ${WIN_COLS * WIN_ROWS} slots but there are only ` +
+                 `${N} projects — repeats on one screen are unavoidable.`);
+  if (GRID_COLS % N || (WIN_COLS * GRID_ROWS) % N)
+    console.warn(`Tile ${GRID_COLS}x${GRID_ROWS} does not wrap cleanly for ${N} projects — ` +
+                 `GRID_COLS and WIN_COLS*GRID_ROWS must both be multiples of ${N}.`);
+
   const slots = [];
-  for (const { c, r } of candidates) {
-    const here = { c, r };
-    if (slots.filter(o => coVisible(here, o)).length >= MAX_ON_SCREEN) continue;
-    slots.push(Object.assign(here, {
-      x: c * COL_STEP + (hash2(c, r)      - 0.5) * 150,   // break up the lattice
-      y: r * ROW_STEP + (hash2(c + 91, r) - 0.5) * 80,
-      dur:   6.4 + hash2(c + 17, r + 5) * 3.4,
-      delay:       hash2(c + 43, r + 9) * 4.5,
-      project: -1
-    }));
-  }
-
-  // 3. Gaps are good, blank screens are not. If a slot has no card within one
-  //    step in any direction, a viewport could sit there and show nothing —
-  //    so seed one card back in.
   for (let r = 0; r < GRID_ROWS; r++) {
     for (let c = 0; c < GRID_COLS; c++) {
-      const here = { c, r };
-      if (slots.some(o => dCol(c, o.c) <= 1 && dRow(r, o.r) <= 1)) continue;
-      slots.push(Object.assign(here, {
-        x: c * COL_STEP + (hash2(c, r)      - 0.5) * 150,
-        y: r * ROW_STEP + (hash2(c + 91, r) - 0.5) * 80,
+      const residue = ((c + WIN_COLS * r) % N + N) % N;
+      slots.push({
+        c, r,
+        x: c * COL_STEP + (hash2(c, r)      - 0.5) * JITTER_X,
+        y: r * ROW_STEP + (hash2(c + 91, r) - 0.5) * JITTER_Y,
         dur:   6.4 + hash2(c + 17, r + 5) * 3.4,
         delay:       hash2(c + 43, r + 9) * 4.5,
-        project: -1
-      }));
+        project: PROJECT_AT[residue] % N
+      });
     }
   }
-
-  // 4. Assign projects: never repeat within a screen, then even out usage.
-  const used = new Array(WORK.length).fill(0);
-  slots.forEach((slot, i) => {
-    const neighbours = slots.filter(o => o.project >= 0 && coVisible(slot, o));
-    let best = 0, bestScore = Infinity;
-    for (let p = 0; p < WORK.length; p++) {
-      const clashes = neighbours.reduce((n, o) => n + (o.project === p ? 1 : 0), 0);
-      const score = clashes * 1000 + used[p] * 10 + hash2(i, p);
-      if (score < bestScore) { bestScore = score; best = p; }
-    }
-    slot.project = best;
-    used[best]++;
-  });
   return slots;
 }
 
-const TILE_SLOTS = composeTile();
+let TILE_SLOTS = composeTile();
 
 if (!WORK.length) console.error('WORK is empty — the canvas will render nothing.');
 
@@ -679,6 +659,7 @@ function makeAura(src) {
   aura.className = 'card-aura';
   const ai = document.createElement('img');
   ai.src = src; ai.alt = ''; ai.draggable = false; ai.setAttribute('aria-hidden', 'true');
+  ai.loading = 'lazy';   // one aura per card, and the canvas holds a lot of cards
   aura.append(ai);
   return aura;
 }
@@ -1073,6 +1054,23 @@ function showToast(msg) {
 buildArtboard();
 centerCanvas();
 wrapEdges();
+
+/* Spacing is derived from the window, so a resize has to re-lay the canvas —
+   otherwise a window dragged wider starts fitting more cards than there are
+   projects and the same project can appear twice on screen. */
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (modalOverlay.classList.contains('open')) return;   // don't yank the canvas mid-read
+    computeGeometry();
+    TILE_SLOTS = composeTile();
+    artboard.innerHTML = '';
+    buildArtboard();
+    centerCanvas();
+    wrapEdges();
+  }, 250);
+});
 
 // backdrop-filter on the blur-overlay won't pick up will-change:transform
 // layers until their transform is updated at least once. Force it.
