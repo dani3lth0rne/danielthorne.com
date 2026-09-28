@@ -1,10 +1,10 @@
 /* ── Grid constants ── */
-const GRID_COLS = 4;
+const GRID_COLS = 6;     // must satisfy GRID_COLS * GRID_ROWS >= WORK.length
 const GRID_ROWS = 2;
-const COL_STEP  = 400;   // card 280 + gap 120
-const ROW_STEP  = 330;   // card 210 + gap 120
-const TILE_W    = GRID_COLS * COL_STEP;   // 1600
-const TILE_H    = GRID_ROWS * ROW_STEP;   // 660
+const COL_STEP  = 560;   // card 280 + gap 280
+const ROW_STEP  = 480;   // card 210 + gap 270
+const TILE_W    = GRID_COLS * COL_STEP;   // 3360
+const TILE_H    = GRID_ROWS * ROW_STEP;   // 960
 const TILES_X   = 9;
 const TILES_Y   = 7;
 const CANVAS_W  = TILES_X * TILE_W;       // 14400
@@ -269,6 +269,240 @@ const WORK = [
         ]
       }
     ]
+  },
+  {
+    id: 'connect-social',
+    title: 'Connect Social',
+    headline: 'Quiet confidence,<br>in a category that shouts.',
+    client: 'Connect Social', date: '2026', type: 'Brand identity, design system',
+    role: 'Brand design lead',
+    description: 'Connect Social is a performance marketing agency for high-growth e-commerce, DTC and subscription brands. They keep the roster small on purpose. The brand had to feel like the work — measured, sharp, and quietly better than everyone else’s.',
+    thumb: 'images/cs-attention.jpg',
+    hero:  'images/cs-logo.jpg',
+    liveUrl: 'https://danielthorne.com/projects/connect-social',
+    tags: ['Brand Identity', 'Design System', 'Performance Marketing'],
+    blocks: [
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/cs-logo.jpg', caption: 'Primary lockup — the existing mark, rebuilt into a system' } ] },
+
+      { kind: 'text', label: '01 — Positioning',
+        heading: 'If Vercel and Stripe ran a performance marketing agency',
+        body: ['That was the brief, more or less. The category defaults to loud: neon dashboards, guru energy, screenshots of ad spend. Connect Social wanted the opposite — selective, engineered, expensive-feeling. A brand that reads as the sharpest partner in the room rather than the one selling hardest.',
+               'The logo stayed. Everything else — colour, type, layout, graphic language — was open. The work leans almost entirely black and white and lets typography carry the weight, with a single acid lime held back for moments that need to land.'] },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/cs-attention.jpg', caption: 'Campaign statement — attention that lasts' } ] },
+
+      { kind: 'text', label: '02 — Type & palette',
+        heading: 'Three typefaces, each with a job',
+        body: ['Space Grotesk sets display and marketing headlines in all caps. Host Grotesk handles every piece of standard communication — body, subheads, buttons, navigation. Geist Mono is reserved for anything structural or factual: dates, prices, metrics, tags, page numbers.',
+               'The palette is four values. Lime is an accent, never a background wash; it is the only colour in a system otherwise built from ink, light and a single warm grey.'] },
+
+      { kind: 'media', layout: 'pair', items: [
+        { src: 'images/cs-type.jpg',  caption: 'Typeface roles' },
+        { src: 'images/cs-icons.jpg', caption: 'Iconography & overlay elements' } ] },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/cs-palette.jpg', caption: 'Lime EBFF00 · Dark 070707 · Light F8F8F8 · Grey CBC7BC' } ] },
+
+      { kind: 'quote', text: 'Measured, sharp, and quietly better than everyone else’s.', by: 'Brand principle' },
+
+      { kind: 'text', label: '03 — Photography',
+        heading: 'Documentary, not stock',
+        body: 'Black-and-white, cinematic, editorial. Urban environments and candid people in motion, shot with high contrast, deep blacks and visible grain. Motion blur is encouraged. Colour stays out of the photography entirely so the accent can do its job on top of it.' },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/cs-photography.jpg', caption: 'Photography direction' } ] },
+
+      { kind: 'text', label: '04 — In use',
+        heading: 'Holds up in a Meta feed and a boardroom PDF',
+        body: 'The system had to survive both extremes: a paid social placement scrolled past in half a second, and a deck opened across a table. Same grid, same restraint, different volume.' },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/cs-growth.jpg', caption: 'Deck system — slide example' } ] },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/cs-posters.jpg', caption: 'Out-of-home and paid social' } ] }
+    ]
+  },
+  {
+    id: 'taiga-data',
+    title: 'Taiga Data',
+    headline: 'Making c-store data<br>legible.',
+    client: 'Taiga Data', date: '2025 — 2026', type: 'Rebrand & website',
+    role: 'Brand and web design',
+    description: 'Taiga is a front-office data platform built exclusively for convenience store retailers — fuel, loyalty, POS and ATG systems pulled into one place. A full rebrand, then a marketing site designed around the people who actually have to read the numbers.',
+    thumb: 'images/taiga-browser.jpg',
+    hero:  'images/taiga-browser.jpg',
+    liveUrl: 'https://danielthorne.com/projects/taiga-data',
+    tags: ['Rebrand', 'Web Design', 'Data Platform'],
+    blocks: [
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/taiga-browser.jpg', caption: 'Homepage' } ] },
+
+      { kind: 'text', label: '01 — Rebrand',
+        heading: 'A mark that grows out of the name',
+        body: ['Taiga is the boreal forest — the largest land biome on earth, and a fitting image for a platform that sits over an entire enterprise. The mark stacks into a conifer built from data strata, and the wordmark is set in a soft geometric sans that keeps a B2B product from feeling clinical.',
+               'The palette runs deep pine through to a signal chartreuse, with soft greens and a lavender reserved for data moments. It is colour used to separate and clarify, never to decorate.'] },
+
+      { kind: 'media', layout: 'pair', items: [
+        { src: 'images/taiga-brandgrid.jpg', caption: 'Identity system' },
+        { src: 'images/taiga-palette.jpg',   caption: 'Palette' } ] },
+
+      { kind: 'text', label: '02 — The site',
+        heading: 'Built for operators, not analysts',
+        body: 'Convenience retail runs on thin margins and fast decisions. The site leads with outcomes rather than architecture — what changes on the floor, in the fuel pricing, in the promo calendar — and only then explains the platform underneath.' },
+
+      { kind: 'scroller', src: 'images/taiga-page-full.jpg', url: 'taigadata.com',
+        caption: 'Full homepage — scroll' },
+
+      { kind: 'stats', items: [
+        { n: '22M+',  l: 'Transactions monitored daily' },
+        { n: '200+',  l: 'Stores nationwide' },
+        { n: '2.1M',  l: 'Transactions processed yearly' },
+        { n: '15K+',  l: 'Customers' } ] },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/taiga-cards.jpg', caption: 'Proof section — colour as a sorting device' } ] },
+
+      { kind: 'text', label: '03 — Audience routes',
+        heading: 'One platform, five ways in',
+        body: 'Retail, IT, Operators, Leadership and Core Platform each got their own page. Same spine, different evidence — an IT director and a store operator arrive with completely different questions, and the site answers each without making either read the other’s.' },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/taiga-pages.png', float: true, caption: 'Retail · IT · Operators' } ] },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/taiga-integrations.jpg', caption: 'Integrations — fuel pumps, loyalty, POS, ATG' } ] },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/taiga-footer.jpg', caption: 'Footer and closing call to action' } ] }
+    ]
+  },
+  {
+    id: 'adv',
+    title: 'ADV',
+    headline: 'Advantage,<br>you.',
+    client: 'ADV', date: '2024', type: 'Brand identity',
+    role: 'Brand design lead',
+    description: 'ADV builds premium, functional tennis gear for players dedicated to a lifetime of play. The brand needed to sit next to the heritage names on a pro-shop wall without borrowing any of their language — daring, experimental, and unmistakably its own.',
+    thumb: 'images/adv-mission.jpg',
+    hero:  'images/adv-logo.jpg',
+    liveUrl: 'https://danielthorne.com/projects/adv',
+    tags: ['Brand Identity', 'Sport', 'Social System'],
+    blocks: [
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/adv-logo.jpg', caption: 'Identity' } ] },
+
+      { kind: 'text', label: '01 — Vision & mission',
+        heading: 'A brand for a lifetime of play',
+        body: 'Tennis branding tends to split into two camps: country-club heritage or hyper-technical performance. ADV sits between them — engineered gear with the attitude of a club crew, spoken in near-black and a spring green that reads instantly on clay, hard court and feed alike.' },
+
+      { kind: 'media', layout: 'pair', items: [
+        { src: 'images/adv-vision.jpg',  caption: 'Vision' },
+        { src: 'images/adv-mission.jpg', caption: 'Mission' } ] },
+
+      { kind: 'quote', text: 'To be the daring, innovative and experimental brand for racquet sports athletes.', by: 'ADV — vision' },
+
+      { kind: 'text', label: '02 — The system',
+        heading: 'Rules tight enough to hand over',
+        body: 'Clear space, minimum sizes, line weights, the approved and unapproved treatments of the mark, and a single geometric sans carrying every tier of type. The guide was built so a social manager could open it on a Friday and ship correct work without asking anyone.' },
+
+      { kind: 'media', layout: 'pair', items: [
+        { src: 'images/adv-guide.jpg', caption: 'Logo rules' },
+        { src: 'images/adv-type.jpg',  caption: 'Type scale' } ] },
+
+      { kind: 'text', label: '03 — Social',
+        heading: 'Templates that survive contact with a feed',
+        body: 'A kit of post formats — pill labels, outlined type lockups, organic photo masks and vertical location rules — that let the team produce a month of content in an afternoon and still look like one brand.' },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/adv-social.png', float: true, caption: 'Instagram templates' } ] },
+
+      { kind: 'media', layout: 'inset', items: [
+        { src: 'images/adv-contents.jpg', caption: 'Brand book' } ] }
+    ]
+  },
+  {
+    id: 'beri',
+    title: 'Beri',
+    headline: 'Experience the<br>wonders of Amla.',
+    client: 'Beri by Dr. Kanodia', date: '2024 — 2025', type: 'Brand lead — packaging, campaign, site',
+    role: 'Brand & creative direction',
+    description: 'Beri is Amla-enhanced skincare from Dr. Kanodia, built on a fruit used for thousands of years and grown on one of the first Amla orchards in America. I led the brand end to end — packaging, digital marketing, visual direction, and the creative direction of the photography that had to hold it all together.',
+    thumb: 'images/beri-product.jpg',
+    hero:  'images/beri-product.jpg',
+    liveUrl: 'https://danielthorne.com/projects/beri',
+    tags: ['Brand Direction', 'Packaging', 'Art Direction', 'Web Design'],
+    blocks: [
+      { kind: 'media', layout: 'mid', items: [
+        { src: 'images/beri-product.jpg', caption: 'Amla Youth Serum — 30ml' } ] },
+
+      { kind: 'text', label: '01 — The brand',
+        heading: 'Organic purity, mystic allure',
+        body: ['Amla is a remarkable fruit — among the richest plant sources of antioxidants on earth, with an ORAC value that makes pomegranate and goji look ordinary. The brand had to carry both halves of that story: the botanical heritage and the clinical result.',
+               'Freight Display Pro sets everything brand-facing with a quiet editorial confidence, with Sharp Grotesk handling details and sub-headings. The palette is a deep Beri Green against a warm cream, with sage as the bridge between them.'] },
+
+      { kind: 'media', layout: 'pair', items: [
+        { src: 'images/beri-logos.jpg',  caption: 'Wordmark construction' },
+        { src: 'images/beri-colors.jpg', caption: 'Beri Green 1D382A · Sage 9CB797 · Light FFFCDD' } ] },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/beri-type.jpg', caption: 'Typography' } ] },
+
+      { kind: 'quote', text: 'An enchanting blend of organic purity and mystic allure.', by: 'Brand principle' },
+
+      { kind: 'text', label: '02 — Packaging',
+        heading: 'A letter in every box',
+        body: 'The insert card carries a note from Dr. Kanodia about his mother introducing him to Amla as a child — the reason the orchard and the product exist. It turns the unboxing into the one moment where the brand gets to speak in the first person.' },
+
+      { kind: 'media', layout: 'inset', items: [
+        { src: 'images/beri-pack-box.jpg', caption: 'Bottle and carton' } ] },
+
+      { kind: 'media', layout: 'mid', items: [
+        { src: 'images/beri-card.png', float: true, caption: 'Insert card — recto and verso' } ] },
+
+      { kind: 'text', label: '03 — Visual direction',
+        heading: 'Wonder, rejuvenation, home',
+        body: 'The direction brief was bold and specific: high contrast, rich colour, innovative lighting, euphoric filters, natural elements — and story first, always. Every shot had to feel like it was taken somewhere real rather than staged against seamless.' },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/beri-photo.jpg', caption: 'Visual direction' } ] },
+
+      { kind: 'media', layout: 'pair', items: [
+        { src: 'images/beri-photogrid.jpg',   caption: 'Photography categories' },
+        { src: 'images/beri-social-dir.jpg',  caption: 'Social guidelines' } ] },
+
+      { kind: 'text', label: '04 — Campaign',
+        heading: 'Teaching the fruit, selling the serum',
+        body: 'The launch campaign led with education — a series comparing Amla’s antioxidant value against the fruits people already believe in — then closed on the product and the claim: brighter, firmer, stronger skin, powered by nature and science.' },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/beri-social.png', float: true, caption: 'Paid and organic social' } ] },
+
+      { kind: 'media', layout: 'narrow', items: [
+        { src: 'images/beri-ad.jpg', caption: 'Static ad — 9:16' } ] },
+
+      { kind: 'text', label: '05 — The site',
+        heading: 'amlaberi.com',
+        body: ['The storefront had to do what the insert card does — lead with the fruit, not the formula. The homepage opens on Amla itself and only then earns its way to the serum, with the antioxidant proof points sitting between the two.',
+               'Freight Display carries the long-form voice throughout, set against the same cream and deep green, and the footer closes on the wordmark at full scale.'] },
+
+      { kind: 'scroller', src: 'images/beri-site-full.jpg', url: 'amlaberi.com',
+        caption: 'amlaberi.com — full homepage, scroll' },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/beri-site-amla.jpg', caption: 'The case for Amla' } ] },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/beri-site-doctor.jpg', caption: 'The doctor behind the orchard' } ] },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/beri-site-footer.jpg', caption: 'Footer' } ] },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/beri-hero-fruit.jpg', caption: 'Amla Youth Serum' } ] }
+    ]
   }
 ];
 
@@ -307,15 +541,35 @@ const modalClose   = document.getElementById('modal-close-btn');
 const modalLink    = document.getElementById('modal-link-btn');
 const hint         = document.getElementById('hint');
 const toast        = document.getElementById('toast');
+const blurOverlay  = document.getElementById('blur-overlay');
+
+/* ── Cursor lens ── */
+let lastMouseX = -600, lastMouseY = -600;
+
+document.addEventListener('mousemove', e => {
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+  // Don't update the lens while dragging — it fights the pan and displaces items
+  if (!dragging) {
+    blurOverlay.style.setProperty('--cx', e.clientX + 'px');
+    blurOverlay.style.setProperty('--cy', e.clientY + 'px');
+  }
+});
 
 /* ── Build artboard ── */
 
-// Local tile positions: 4×2 grid
+// Local tile positions: GRID_COLS × GRID_ROWS grid — one slot per work item.
 const TILE_POSITIONS = [];
 for (let r = 0; r < GRID_ROWS; r++) {
   for (let c = 0; c < GRID_COLS; c++) {
     TILE_POSITIONS.push({ x: c * COL_STEP, y: r * ROW_STEP });
   }
+}
+// Every item needs a slot; without one the tile builder throws mid-drag and the
+// canvas stops rendering. Fail loudly here instead.
+if (TILE_POSITIONS.length < WORK.length) {
+  console.error(`Grid has ${TILE_POSITIONS.length} slots but WORK has ${WORK.length} items — ` +
+                `raise GRID_COLS/GRID_ROWS and extend SLOT_DUR/SLOT_DEL.`);
 }
 
 // Per-slot jitter — seed is item index only, so every tile copy has the same offset.
@@ -325,52 +579,72 @@ function slotJitter(idx, range) {
   const s = Math.sin(idx * 127.1 + 311.7) * 43758.5453123;
   return (s - Math.floor(s) - 0.5) * 2 * range;
 }
-const SLOT_JX = WORK.map((_, i) => slotJitter(i,      48));  // ±48px horizontal
-const SLOT_JY = WORK.map((_, i) => slotJitter(i + 50, 36));  // ±36px vertical
+const SLOT_JX  = WORK.map((_, i) => slotJitter(i,      48));
+const SLOT_JY  = WORK.map((_, i) => slotJitter(i + 50, 36));
+const SLOT_DUR = [7.2, 9.1, 6.8, 8.6, 7.9, 8.3, 6.5, 9.4, 7.6, 8.9, 7.0, 9.7]; // per slot
+const SLOT_DEL = [0,   1.6, 3.1, 0.8, 4.2, 2.2, 1.1, 3.7, 2.6, 0.4, 3.4, 1.9]; // per slot
 
-function makeWorkItem(project, absX, absY) {
+function makeAura(src) {
+  const aura = document.createElement('div');
+  aura.className = 'card-aura';
+  const ai = document.createElement('img');
+  ai.src = src; ai.alt = ''; ai.draggable = false; ai.setAttribute('aria-hidden', 'true');
+  aura.append(ai);
+  return aura;
+}
+
+function makeWorkItem(project, absX, absY, idx) {
   const el = document.createElement('div');
   el.className = 'artboard-item mode-work';
-  el.style.left = absX + 'px';
-  el.style.top  = absY + 'px';
+  el.style.cssText = `left:${absX}px; top:${absY}px; --float-dur:${SLOT_DUR[idx]}s; --float-delay:${SLOT_DEL[idx]}s;`;
 
   const card = document.createElement('div');
   card.className = 'item-card';
 
   const img = document.createElement('img');
+  img.className = 'card-img';
   img.src = project.thumb;
   img.alt = project.title;
   img.loading = 'lazy';
   img.draggable = false;
 
-  card.append(img);
+  card.append(makeAura(project.thumb), img);
   card.addEventListener('click', () => { if (!didDrag) openWorkModal(project); });
   el.append(card);
   return el;
 }
 
-function makePhotoItem(p, absX, absY) {
+function makePhotoItem(p, absX, absY, dur = 7, delay = 0) {
   const el = document.createElement('div');
   el.className = 'artboard-item mode-personal';
-  el.style.cssText = `left:${absX}px; top:${absY}px;`;
+  el.style.cssText = `left:${absX}px; top:${absY}px; --float-dur:${dur}s; --float-delay:${delay}s;`;
 
   const card = document.createElement('div');
   card.className = 'item-photo';
 
-  const media = p.thumb
-    ? `<img src="${p.thumb}" alt="${p.title}" draggable="false">`
-    : `<div class="photo-placeholder"><span>Photo</span></div>`;
+  if (p.thumb) {
+    const img = document.createElement('img');
+    img.className = 'card-img';
+    img.src = p.thumb; img.alt = p.title; img.draggable = false;
+    card.append(makeAura(p.thumb), img);
+  } else {
+    card.innerHTML = `<div class="photo-placeholder"><span>Photo</span></div>`;
+  }
 
-  card.innerHTML = `${media}<div class="photo-label">${p.title}</div>`;
+  const label = document.createElement('div');
+  label.className = 'photo-label';
+  label.textContent = p.title;
+  card.append(label);
+
   card.addEventListener('click', () => { if (!didDrag) openPersonalModal(p); });
   el.append(card);
   return el;
 }
 
-function makePaperItem(p, absX, absY) {
+function makePaperItem(p, absX, absY, dur = 7, delay = 0) {
   const el = document.createElement('div');
   el.className = 'artboard-item mode-personal';
-  el.style.cssText = `left:${absX}px; top:${absY}px;`;
+  el.style.cssText = `left:${absX}px; top:${absY}px; --float-dur:${dur}s; --float-delay:${delay}s;`;
 
   const card = document.createElement('div');
   card.className = 'item-paper';
@@ -395,7 +669,7 @@ function buildArtboard() {
       const oy = row * TILE_H;
       WORK.forEach((project, idx) => {
         const { x: lx, y: ly } = TILE_POSITIONS[idx];
-        artboard.append(makeWorkItem(project, ox + lx + SLOT_JX[idx], oy + ly + SLOT_JY[idx]));
+        artboard.append(makeWorkItem(project, ox + lx + SLOT_JX[idx], oy + ly + SLOT_JY[idx], idx));
       });
     }
   }
@@ -414,8 +688,10 @@ function buildArtboard() {
       const oy = row * TILE_H;
       PERSONAL.forEach((p, idx) => {
         const pos = P_POSITIONS[idx];
-        if (p.type === 'photo') artboard.append(makePhotoItem(p, ox + pos.x, oy + pos.y));
-        if (p.type === 'paper') artboard.append(makePaperItem(p, ox + pos.x, oy + pos.y));
+        const dur   = [6.4, 7.8, 8.2, 7.1, 9.0][idx];
+        const delay = [0.4, 1.8, 3.2, 0.9, 2.6][idx];
+        if (p.type === 'photo') artboard.append(makePhotoItem(p, ox + pos.x, oy + pos.y, dur, delay));
+        if (p.type === 'paper') artboard.append(makePaperItem(p, ox + pos.x, oy + pos.y, dur, delay));
       });
     }
   }
@@ -433,10 +709,11 @@ function wrapEdges() {
   const minX = -(CANVAS_W - window.innerWidth);
   const minY = -(CANVAS_H - window.innerHeight);
 
-  if (panX > -TILE_W)          { panX -= TILE_W; startX -= TILE_W; }
-  if (panX < minX + TILE_W)    { panX += TILE_W; startX += TILE_W; }
-  if (panY > -TILE_H)          { panY -= TILE_H; startY -= TILE_H; }
-  if (panY < minY + TILE_H)    { panY += TILE_H; startY += TILE_H; }
+  // startX/Y must move OPPOSITE to panX/Y so the drag anchor stays consistent
+  if (panX > -TILE_W)        { panX -= TILE_W; startX += TILE_W; }
+  if (panX < minX + TILE_W)  { panX += TILE_W; startX -= TILE_W; }
+  if (panY > -TILE_H)        { panY -= TILE_H; startY += TILE_H; }
+  if (panY < minY + TILE_H)  { panY += TILE_H; startY -= TILE_H; }
 }
 
 function centerCanvas() {
@@ -452,6 +729,9 @@ artboardWrap.addEventListener('mousedown', e => {
   startX = e.clientX - panX;
   startY = e.clientY - panY;
   artboardWrap.classList.add('dragging');
+  // Move lens off-screen while dragging so it doesn't conflict with panning
+  blurOverlay.style.setProperty('--cx', '-9999px');
+  blurOverlay.style.setProperty('--cy', '-9999px');
 });
 
 document.addEventListener('mousemove', e => {
@@ -468,7 +748,12 @@ document.addEventListener('mousemove', e => {
 document.addEventListener('mouseup', () => {
   dragging = false;
   artboardWrap.classList.remove('dragging');
-  setTimeout(() => { didDrag = false; }, 50);
+  setTimeout(() => {
+    didDrag = false;
+    // Restore lens to wherever the cursor landed
+    blurOverlay.style.setProperty('--cx', lastMouseX + 'px');
+    blurOverlay.style.setProperty('--cy', lastMouseY + 'px');
+  }, 50);
 });
 
 artboardWrap.addEventListener('touchstart', e => {
@@ -527,13 +812,17 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
 function openModal(content) {
   modalInner.innerHTML = '';
   modalInner.append(content);
-  modalInner.scrollTop = 0;
+  modalOverlay.scrollTop = 0;
   modalOverlay.classList.add('open');
+  document.body.classList.add('modal-open');
+  blurOverlay.classList.add('hidden');
   document.addEventListener('keydown', onKey);
 }
 
 function closeModal() {
   modalOverlay.classList.remove('open');
+  document.body.classList.remove('modal-open');
+  blurOverlay.classList.remove('hidden');
   document.removeEventListener('keydown', onKey);
   activeItem = null;
 }
@@ -541,37 +830,104 @@ function closeModal() {
 function onKey(e) { if (e.key === 'Escape') closeModal(); }
 
 modalClose.addEventListener('click', closeModal);
-modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+// Close when clicking the overlay backdrop — anywhere outside the modal frame
+// Close on any click outside the content column — including the gutters to its
+// left and right. (.modal-frame spans the full width, so testing against it
+// would never match a gutter click; .modal-inner hugs the content.)
+modalOverlay.addEventListener('click', e => {
+  if (modalInner.contains(e.target)) return;
+  if (e.target.closest('.modal-controls')) return;   // the buttons handle themselves
+  closeModal();
+});
+
+/* ── Case-study block renderers ──
+   Blocks carry a `kind`. Legacy entries (plain {heading, body, images})
+   are normalised into blocks so both schemas render through one path. */
+
+const paras = t => (Array.isArray(t) ? t : [t]).map(x => `<p class="cs-p">${x}</p>`).join('');
+
+function figure(item) {
+  const src = typeof item === 'string' ? item : item.src;
+  const cap = typeof item === 'string' ? '' : item.caption;
+  const float = typeof item === 'object' && item.float ? ' float' : '';
+  return `<figure class="cs-fig${float}">
+    <img src="${src}" alt="${cap || ''}" loading="lazy">
+    ${cap ? `<figcaption class="cs-cap">${cap}</figcaption>` : ''}
+  </figure>`;
+}
+
+const BLOCK = {
+  text: b => `
+    ${b.heading ? `<div class="cs-split">
+        <div>${b.label ? `<div class="cs-label">${b.label}</div>` : ''}
+             <h2 class="cs-h">${b.heading}</h2></div>
+        <div>${paras(b.body)}</div>
+      </div>`
+      : `${b.label ? `<div class="cs-label">${b.label}</div>` : ''}${paras(b.body)}`}`,
+
+  media: b => `<div class="cs-media ${b.layout || 'full'}">
+      ${b.items.map(figure).join('')}
+    </div>`,
+
+  quote: b => `<blockquote class="cs-quote">${b.text}
+      ${b.by ? `<div class="cs-quote-by">${b.by}</div>` : ''}
+    </blockquote>`,
+
+  stats: b => `<div class="cs-stats">
+      ${b.items.map(s => `<div><div class="cs-stat-n">${s.n}</div>
+                               <div class="cs-stat-l">${s.l}</div></div>`).join('')}
+    </div>`,
+
+  scroller: b => `<div class="cs-scroll-win">
+      <div class="cs-scroll-bar">
+        <i style="background:#f0625a"></i><i style="background:#f4bd4f"></i><i style="background:#61c454"></i>
+        <span class="cs-scroll-url">${b.url || ''}</span>
+      </div>
+      <div class="cs-scroll-vp"><img src="${b.src}" alt="${b.caption || ''}" loading="lazy"></div>
+    </div>
+    ${b.caption ? `<div class="cs-cap">${b.caption}</div>` : ''}`
+};
+
+function toBlocks(p) {
+  if (p.blocks) return p.blocks;
+  // Legacy shape: hero image, then heading/body/images per section.
+  const out = [{ kind: 'media', layout: 'full', items: [p.hero] }];
+  p.sections.forEach(s => {
+    out.push({ kind: 'text', heading: s.heading, body: s.body });
+    if (s.images && s.images.length)
+      out.push({ kind: 'media', layout: s.images.length === 2 ? 'pair' : 'full', items: s.images });
+  });
+  return out;
+}
 
 function openWorkModal(p) {
   activeItem = p;
 
-  const sectionsHTML = p.sections.map(s => `
-    <div class="cs-section">
-      <div class="cs-section-heading">${s.heading}</div>
-      <p class="cs-section-body">${s.body}</p>
-      ${s.images.map(img => `<img class="cs-img" src="${img}" alt="" loading="lazy">`).join('')}
-    </div>
-  `).join('');
+  const blocksHTML = toBlocks(p)
+    .map(b => `<div class="cs-block">${(BLOCK[b.kind] || BLOCK.text)(b)}</div>`)
+    .join('');
 
-  const tagsHTML = p.tags.map(t => `<span class="modal-tag">${t}</span>`).join('');
+  const facts = [
+    ['Client', p.client],
+    ['Year',   p.date],
+    ['Scope',  p.type],
+    p.role ? ['Role', p.role] : null
+  ].filter(Boolean);
 
   const wrap = document.createElement('div');
   wrap.className = 'cs-modal';
   wrap.innerHTML = `
-    <div class="cs-hero"><img src="${p.hero}" alt="${p.title}"></div>
-    <div class="cs-body">
-      <div class="cs-meta-row">
-        <div class="cs-meta-item"><span class="cs-meta-label">Client</span><span class="cs-meta-value">${p.client}</span></div>
-        <div class="cs-meta-item"><span class="cs-meta-label">Date</span><span class="cs-meta-value">${p.date}</span></div>
-        <div class="cs-meta-item"><span class="cs-meta-label">Type</span><span class="cs-meta-value">${p.type}</span></div>
+    <header class="cs-head">
+      <div class="cs-eyebrow">${p.tags.map(t => `<span>${t}</span>`).join('')}</div>
+      <h1 class="cs-title">${p.headline || p.title}</h1>
+      <p class="cs-lede">${p.description}</p>
+      <div class="cs-facts">
+        ${facts.map(([k, v]) => `<div><div class="cs-fact-k">${k}</div>
+                                     <div class="cs-fact-v">${v}</div></div>`).join('')}
       </div>
-      <h1 class="cs-title">${p.title}</h1>
-      <div class="cs-rule"></div>
-      <p class="cs-overview">${p.description}</p>
-      ${sectionsHTML}
-      <div class="modal-tags" style="margin-top:8px">${tagsHTML}</div>
-    </div>
+    </header>
+    ${blocksHTML}
+    <div class="cs-foot">${p.tags.map(t => `<span class="modal-tag">${t}</span>`).join('')}</div>
   `;
 
   openModal(wrap);
@@ -625,5 +981,12 @@ function showToast(msg) {
 /* ── Init ── */
 buildArtboard();
 centerCanvas();
-// Pre-wrap so we start well inside safe territory
 wrapEdges();
+
+// backdrop-filter on the blur-overlay won't pick up will-change:transform
+// layers until their transform is updated at least once. Force it.
+requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    applyTransform();
+  });
+});

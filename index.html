@@ -7,10 +7,21 @@
   <title>Daniel Thorne</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Geist+Mono:wght@300..600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-mode="work">
+
+  <!-- Animated gradient field -->
+  <div class="gradient-field">
+    <div class="g-blob g-b1"></div>
+    <div class="g-blob g-b2"></div>
+    <div class="g-blob g-b3"></div>
+    <div class="g-blob g-b4"></div>
+    <div class="g-blob g-b5"></div>
+    <div class="g-blob g-b6"></div>
+    <div class="g-blob g-b7"></div>
+  </div>
 
   <!-- Fixed chrome -->
   <div class="chrome">
@@ -45,6 +56,9 @@
     <div class="artboard" id="artboard"></div>
   </div>
 
+  <!-- Cursor-lens blur overlay -->
+  <div class="blur-overlay" id="blur-overlay"></div>
+
   <!-- Drag hint -->
   <div class="hint" id="hint">drag to explore</div>
 
@@ -74,6 +88,9 @@
   <div class="toast" id="toast">Link copied</div>
 
   <script src="js/main.js"></script>
-  <script src="js/annotate.js"></script>
+  <!-- TEMPORARY — annotate tool hidden for launch. It injects its own button,
+       panel and styles, so not loading it removes it entirely.
+       To restore: uncomment this one line. js/annotate.js is untouched. -->
+  <!-- <script src="js/annotate.js"></script> -->
 </body>
 </html>
