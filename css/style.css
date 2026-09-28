@@ -28,7 +28,7 @@ img { display: block; }
    Everything else stays in Host Grotesk. */
 .cs-eyebrow, .cs-fact-k, .cs-label, .cs-cap, .cs-stat-l, .cs-quote-by,
 .cs-scroll-url, .modal-tag, .photo-label, .paper-footer, .hint,
-.wordmark, .mode-btn, .toast, .mono {
+.wordmark, .mode-btn, .filter-btn, .toast, .mono {
   font-family: var(--font-mono);
   font-weight: 400;
 }
@@ -78,6 +78,89 @@ html, body {
   border-radius: 100px;
   pointer-events: auto;
   box-shadow: 0 2px 20px rgba(148,133,116,0.18);
+}
+
+/* ── Work filter — glass pill ── */
+.filter {
+  position: absolute;
+  left: 50%;
+  top: 22px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 100px;
+  pointer-events: auto;
+
+  /* Glass: a light wash over whatever the canvas is doing underneath, a bright
+     top edge for the lit rim, and a soft drop to lift it off the page. */
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0.28)
+  );
+  backdrop-filter: blur(20px) saturate(1.7);
+  -webkit-backdrop-filter: blur(20px) saturate(1.7);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.45) inset,
+    0 8px 28px rgba(120, 104, 84, 0.16),
+    0 2px 6px rgba(120, 104, 84, 0.10);
+}
+
+/* The travelling highlight that sits under the live option. */
+.filter-thumb {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  height: calc(100% - 8px);
+  border-radius: 100px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.98),
+    rgba(255, 255, 255, 0.86)
+  );
+  box-shadow:
+    0 1px 2px rgba(120, 104, 84, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+  /* A touch of overshoot so it arrives with some life rather than easing flat. */
+  transition:
+    transform 0.52s cubic-bezier(0.34, 1.42, 0.52, 1),
+    width     0.52s cubic-bezier(0.34, 1.42, 0.52, 1);
+  will-change: transform, width;
+}
+
+.filter-btn {
+  position: relative;
+  z-index: 1;
+  padding: 7px 17px;
+  border-radius: 100px;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(20, 18, 15, 0.46);
+  white-space: nowrap;
+  transition: color 0.34s var(--ease), transform 0.2s var(--ease);
+}
+.filter-btn:hover      { color: rgba(20, 18, 15, 0.78); }
+.filter-btn:active     { transform: scale(0.95); }
+.filter-btn.active     { color: var(--text); }
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-thumb { transition: none; }
+}
+
+/* Cross-fade while the canvas is re-laid under the new filter. */
+.artboard {
+  transition: opacity 0.22s var(--ease);
+}
+.artboard.swapping {
+  opacity: 0;
+}
+
+@media (max-width: 560px) {
+  .filter-btn { padding: 7px 12px; font-size: 9.5px; letter-spacing: 0.1em; }
 }
 
 /* TEMPORARY — work/personal toggle hidden for launch.

@@ -5,16 +5,8 @@
 
    The tile is deliberately much larger than a viewport (≈4.5 screens wide,
    ≈5 tall) so you have to travel a long way before anything repeats. */
-/* The largest block of slots a single screen may touch. 4 × 3 = 12 is exactly
-   the number of projects, so a screen can hold all twelve and never repeat one.
-   GRID_COLS must be a multiple of WORK.length, and WIN_COLS × GRID_ROWS too,
-   or the pattern will not line up where the tile wraps. */
-const WIN_COLS  = 4;
-const WIN_ROWS  = 3;
-const GRID_COLS = 12;    // slot lattice inside one tile
-const GRID_ROWS = 9;
-const TILES_X   = 3;     // wrapEdges needs CANVAS > 2 tiles + viewport per axis
-const TILES_Y   = 3;
+const TILES_X = 3;       // wrapEdges needs CANVAS > 2 tiles + viewport per axis
+const TILES_Y = 3;
 
 /* How far a card may drift off its lattice point: enough to kill the ruled-grid
    look, small enough that a screen still spans only WIN_COLS × WIN_ROWS slots. */
@@ -23,20 +15,44 @@ const JITTER_Y = 100;
 
 const CARD_W = 280, CARD_H = 210;
 
-/* Spacing is derived from the window rather than fixed, so a screen spans the
-   same 4 × 3 block of slots on a laptop and on a 27" display. That is what
-   keeps "never two of the same project in view" true at every size instead of
-   only up to 1920px — a fixed lattice would fit 20 cards on a big monitor and
-   twelve projects cannot cover that. */
-let COL_STEP, ROW_STEP, TILE_W, TILE_H, CANVAS_W, CANVAS_H;
-
-/* Breathing room. 1 packs a screen to the full 4 × 3 block (~10 cards); higher
-   spreads the lattice so fewer land on screen. Raising it only ever shrinks how
-   many slots a screen spans, so the no-repeat guarantee still holds. */
+/* Breathing room. 1 packs a screen to the full window block; higher spreads the
+   lattice so fewer cards land on screen. Raising it only ever shrinks how many
+   slots a screen spans, so the no-repeat guarantee still holds. */
 const SPREAD = 1.28;
 
-function computeGeometry() {
-  // A viewport spans (view + card + jitter) px; divide across the window block.
+/* All of this is recomputed whenever the filter or the window changes, because
+   both alter how many projects there are to go round. */
+let WIN_COLS, WIN_ROWS, GRID_COLS, GRID_ROWS;
+let COL_STEP, ROW_STEP, TILE_W, TILE_H, CANVAS_W, CANVAS_H;
+
+const gcd = (a, b) => b ? gcd(b, a % b) : a;
+
+/* The largest block of slots one screen may touch, sized so it never exceeds
+   the number of projects on offer — that is what makes "never two of the same
+   project in view" hold rather than merely being likely. */
+function blockFor(n) {
+  if (n >= 12) return [4, 3];
+  if (n >= 8)  return [4, 2];
+  if (n >= 6)  return [3, 2];
+  if (n >= 4)  return [2, 2];
+  if (n >= 2)  return [2, 1];
+  return [1, 1];
+}
+
+function computeGeometry(n) {
+  [WIN_COLS, WIN_ROWS] = blockFor(n);
+
+  /* The pattern only lines up across the tile seam if GRID_COLS and
+     WIN_COLS × GRID_ROWS are both multiples of n. Keep the tile near 8-12 slots
+     a side: big enough that the repeat stays well off screen, small enough that
+     the DOM does not balloon on the narrower filters. */
+  GRID_COLS = n * Math.max(1, Math.round(10 / n));
+  const rowStep = n / gcd(WIN_COLS, n);
+  GRID_ROWS = rowStep * Math.ceil(8 / rowStep);
+
+  /* Spacing comes from the window, not a constant, so a screen spans the same
+     block on a laptop and on a 27" display. A fixed lattice fits ~20 cards on a
+     big monitor, and twelve projects cannot cover that. */
   COL_STEP = Math.max(380, Math.ceil(SPREAD * (window.innerWidth  + CARD_W + JITTER_X) / WIN_COLS));
   ROW_STEP = Math.max(320, Math.ceil(SPREAD * (window.innerHeight + CARD_H + JITTER_Y) / WIN_ROWS));
   TILE_W   = GRID_COLS * COL_STEP;
@@ -44,14 +60,14 @@ function computeGeometry() {
   CANVAS_W = TILES_X * TILE_W;
   CANVAS_H = TILES_Y * TILE_H;
 }
-computeGeometry();
 
 /* ── Project data ── */
 const WORK = [
   {
     id: 'stockpile',
+    category: 'product',
     title: 'Stockpile',
-    client: 'Stockpile', date: 'Feb 2024', type: 'In-House',
+    client: 'Stockpile', date: 'Feb 2024', type: 'Product Design — In-House',
     description: 'Personal finance platform that empowers people to reach investment, budgeting, spending and savings goals. Contributed to launching new budgeting and investment solutions for desktop and mobile, building a new design system and synthesizing research for feature creation.',
     thumb: 'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/65d51ab84b549decb6b8173b_Stockpile-Thumbnail.png',
     hero:  'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/65d6e56b2a007e7ea8deb2b2_Mainimage-Stockpile.png',
@@ -60,7 +76,7 @@ const WORK = [
     sections: [
       {
         heading: 'Budgeting Capabilities',
-        body: 'Stockpile introduced new features requiring impressive UI/UX design. The budgeting page incorporated an entirely new design system derived from the existing one.',
+        body: 'Stockpile introduced new features requiring considered product design. The budgeting page incorporated an entirely new design system derived from the existing one.',
         images: [
           'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/65d62d2e261959bf9d1a42b1_Budget-CS.png',
           'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/65d62e94d2de6b278b35a759_Budget-Desktop.png'
@@ -86,8 +102,9 @@ const WORK = [
   },
   {
     id: 'jp-morgan',
+    category: 'product',
     title: 'JP Morgan',
-    client: 'JP Morgan / Aumni', date: 'Nov 2025', type: 'In-House',
+    client: 'JP Morgan / Aumni', date: 'Nov 2025', type: 'Product Design — In-House',
     description: 'When I joined Aumni, it was a read-only platform — accurate but inflexible. As part of the product team, I helped introduce interactive features that let investors upload and compare their own cap tables and update valuations in real time, transforming Aumni into a trusted, dynamic workspace for investors.',
     thumb: 'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/6908d4af3f31876796d9306d_JPM.png',
     hero:  'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/690964b23050004f0701c122_JPM-wide.png',
@@ -121,8 +138,9 @@ const WORK = [
   },
   {
     id: 'rentler',
+    category: 'product',
     title: 'Rentler',
-    client: 'Rentler', date: 'Jan 2024', type: 'In-House',
+    client: 'Rentler', date: 'Jan 2024', type: 'Product Design — In-House',
     description: 'Work focused on the Rentability Report feature — a revenue driver that was buried, friction-heavy, and delivered data in dense PDFs lacking visual emphasis or narrative flow.',
     thumb: 'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/65d655160a6f3ae503c1c49a_Rentler-Thumbnail.png',
     hero:  'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/65d655123ecbea326b897f7f_Rentler-Main%20Image.png',
@@ -156,8 +174,9 @@ const WORK = [
   },
   {
     id: 'encyclopedia-galactica',
+    category: 'product',
     title: 'Encyclopedia Galactica',
-    client: 'xAI', date: 'Nov 2025', type: 'Side Project',
+    client: 'xAI', date: 'Nov 2025', type: 'Product Design — Side Project',
     description: 'UI redesign for Grokopedia\'s transition to Encyclopedia Galactica — enhancing clarity, navigation, summaries, and AI content integration across the platform.',
     thumb: 'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/6920f458cdfe86285b478043_thumbnail%20-%20xai.png',
     hero:  'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/6920ee06561cae08eb9bc9b0_EG-1.png',
@@ -183,8 +202,9 @@ const WORK = [
   },
   {
     id: 'truerent',
+    category: 'product',
     title: 'TrueRent',
-    client: 'TrueRent', date: 'Nov 2023', type: 'In-House',
+    client: 'TrueRent', date: 'Nov 2023', type: 'Product Design — In-House',
     description: 'Property management tool redesigned to improve usability and streamline workflows across property managers, landlords, tenants, owners, and service professionals. Note: TrueRent branding replaces the actual client identity for legal reasons.',
     thumb: 'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/65d5176e3ed1ea9ee11616fc_TC%20Thumbnail.png',
     hero:  'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/65c12dd251274ce8e71640ac_Computer-Mockup.png',
@@ -220,8 +240,9 @@ const WORK = [
   },
   {
     id: 'chekez',
+    category: 'product',
     title: 'Chekez',
-    client: 'Startup', date: 'Jun 2022', type: 'UI/UX, Brand Identity',
+    client: 'Startup', date: 'Jun 2022', type: 'Product Design, Brand Identity',
     description: 'Automated AI-powered task management software that detects and adopts tasks from your various platforms and stores them in one common place. Presented to Adobe\'s Workfront team, who praised its ability to solve issues they were currently facing.',
     thumb: 'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/65d6409e2d808a7db5ec0e9d_Chekez-THumbnail.png',
     hero:  'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/65d6409b929cbda67c465ab3_Chekez-Main%20Image.png',
@@ -260,6 +281,7 @@ const WORK = [
   },
   {
     id: 'form-builder',
+    category: 'product',
     title: 'Form Builder',
     client: 'Bonsai', date: 'Nov 2025', type: 'Product Design',
     description: 'Clean, drag-and-drop form builder with a unique split-panel layout that keeps the workflow light and intuitive. The whole UI leans into a calm, minimal feel — soft edges, clear blocks, and a layout that just makes sense visually.',
@@ -280,8 +302,9 @@ const WORK = [
   },
   {
     id: 'rexchanger',
+    category: 'product',
     title: 'Rexchanger',
-    client: 'Rexchanger', date: 'Jun 2022', type: 'UI/UX, Brand Identity',
+    client: 'Rexchanger', date: 'Jun 2022', type: 'Product Design, Brand Identity',
     description: 'Brand, interface, and app flow redesign transitioning from dull aesthetics to adventurous outdoor gear experiences. Covered logo, colors, typography, mobile UI, and app navigation for a gear-sharing startup.',
     thumb: 'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/65d651d728b3bad81d4d461f_rexchangerthumbnail.png',
     hero:  'https://cdn.prod.website-files.com/65c12dd251274ce8e7163f43/65d651d3ec55f14359d7b318_rexchanger.png',
@@ -308,9 +331,10 @@ const WORK = [
   },
   {
     id: 'connect-social',
+    category: 'brand',
     title: 'Connect Social',
     headline: 'Quiet confidence,<br>in a category that shouts.',
-    client: 'Connect Social', date: '2026', type: 'Brand identity, design system',
+    client: 'Connect Social', date: '2026', type: 'Brand Identity, Design System',
     role: 'Brand design lead',
     description: 'Connect Social is a performance marketing agency for high-growth e-commerce, DTC and subscription brands. They keep the roster small on purpose. The brand had to feel like the work — measured, sharp, and quietly better than everyone else’s.',
     thumb: 'images/cs-attention.jpg',
@@ -363,9 +387,10 @@ const WORK = [
   },
   {
     id: 'taiga-data',
+    category: 'brand',
     title: 'Taiga Data',
     headline: 'Making c-store data<br>legible.',
-    client: 'Taiga Data', date: '2025 — 2026', type: 'Rebrand & website',
+    client: 'Taiga Data', date: '2025 — 2026', type: 'Brand Identity, Web Design',
     role: 'Brand and web design',
     description: 'Taiga is a front-office data platform built exclusively for convenience store retailers — fuel, loyalty, POS and ATG systems pulled into one place. A full rebrand, then a marketing site designed around the people who actually have to read the numbers.',
     thumb: 'images/taiga-browser.jpg',
@@ -417,9 +442,10 @@ const WORK = [
   },
   {
     id: 'adv',
+    category: 'brand',
     title: 'ADV',
     headline: 'Advantage,<br>you.',
-    client: 'ADV', date: '2024', type: 'Brand identity',
+    client: 'ADV', date: '2024', type: 'Brand Identity',
     role: 'Brand design lead',
     description: 'ADV builds premium, functional tennis gear for players dedicated to a lifetime of play. The brand needed to sit next to the heritage names on a pro-shop wall without borrowing any of their language — daring, experimental, and unmistakably its own.',
     thumb: 'images/adv-mission.jpg',
@@ -461,9 +487,10 @@ const WORK = [
   },
   {
     id: 'beri',
+    category: 'brand',
     title: 'Beri',
     headline: 'Experience the<br>wonders of Amla.',
-    client: 'Beri by Dr. Kanodia', date: '2024 — 2025', type: 'Brand lead — packaging, campaign, site',
+    client: 'Beri by Dr. Kanodia', date: '2024 — 2025', type: 'Brand Direction — packaging, campaign, site',
     role: 'Brand & creative direction',
     description: 'Beri is Amla-enhanced skincare from Dr. Kanodia, built on a fruit used for thousands of years and grown on one of the first Amla orchards in America. I led the brand end to end — packaging, digital marketing, visual direction, and the creative direction of the photography that had to hold it all together.',
     thumb: 'images/beri-product.jpg',
@@ -616,14 +643,70 @@ function hash2(x, y) {
   return s - Math.floor(s);
 }
 
-/* Order the roster so the product/UI-UX work carries the canvas: it is two
-   thirds of the list, so it is two thirds of every screen. The four brand
-   projects are spread to the corners of the repeating block rather than left
-   in WORK order, which would band them into every third row. */
-const PROJECT_AT = [8, 0, 1, 11, 2, 9, 3, 4, 5, 6, 10, 7];
+/* Lay out the lattice — positions only. Which project goes where is decided
+   afterwards, once we know which slots the opening view will land on. */
+function layoutSlots() {
+  const out = [];
+  for (let r = 0; r < GRID_ROWS; r++) {
+    for (let c = 0; c < GRID_COLS; c++) {
+      out.push({
+        c, r,
+        x: c * COL_STEP + (hash2(c, r)      - 0.5) * JITTER_X,
+        y: r * ROW_STEP + (hash2(c + 91, r) - 0.5) * JITTER_Y,
+        dur:   6.4 + hash2(c + 17, r + 5) * 3.4,
+        delay:       hash2(c + 43, r + 9) * 4.5
+      });
+    }
+  }
+  return out;
+}
 
-function composeTile() {
-  const N = WORK.length;
+/* The canvas opens centred, so a fixed handful of slots are always the first
+   thing anyone sees. Work out which ones, nearest the middle of the screen
+   first, so the strongest work can be placed there deliberately rather than by
+   whatever the maths happened to put in front. */
+function openingResidues(slots, n) {
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const vx = (CANVAS_W - vw) / 2, vy = (CANVAS_H - vh) / 2;
+  const cx = vx + vw / 2, cy = vy + vh / 2;
+  const seen = new Map();
+
+  for (let ty = 0; ty < TILES_Y; ty++) {
+    for (let tx = 0; tx < TILES_X; tx++) {
+      for (const s of slots) {
+        const x = tx * TILE_W + s.x, y = ty * TILE_H + s.y;
+        if (x + CARD_W < vx || x > vx + vw || y + CARD_H < vy || y > vy + vh) continue;
+        const res = ((s.c + WIN_COLS * s.r) % n + n) % n;
+        const d = Math.hypot(x + CARD_W / 2 - cx, y + CARD_H / 2 - cy);
+        if (!seen.has(res) || d < seen.get(res)) seen.set(res, d);
+      }
+    }
+  }
+  return [...seen.entries()].sort((a, b) => a[1] - b[1]).map(([res]) => res);
+}
+
+/* residue → index into the active roster. The roster is already in priority
+   order, so this drops the best work onto the slots nearest the middle of the
+   opening screen and lets the rest fall where it may. */
+function buildProjectMap(slots, n) {
+  const map = new Array(n).fill(-1);
+  const order = openingResidues(slots, n);
+  const taken = new Set();
+
+  order.forEach((res, i) => {
+    if (i < n) { map[res] = i; taken.add(i); }
+  });
+  let next = 0;
+  for (let res = 0; res < n; res++) {
+    if (map[res] >= 0) continue;
+    while (taken.has(next)) next++;
+    map[res] = next; taken.add(next);
+  }
+  return map;
+}
+
+function composeTile(list) {
+  const N = list.length;
 
   // The guarantee rests on these; if the roster changes, say so out loud.
   if (WIN_COLS * WIN_ROWS > N)
@@ -633,26 +716,38 @@ function composeTile() {
     console.warn(`Tile ${GRID_COLS}x${GRID_ROWS} does not wrap cleanly for ${N} projects — ` +
                  `GRID_COLS and WIN_COLS*GRID_ROWS must both be multiples of ${N}.`);
 
-  const slots = [];
-  for (let r = 0; r < GRID_ROWS; r++) {
-    for (let c = 0; c < GRID_COLS; c++) {
-      const residue = ((c + WIN_COLS * r) % N + N) % N;
-      slots.push({
-        c, r,
-        x: c * COL_STEP + (hash2(c, r)      - 0.5) * JITTER_X,
-        y: r * ROW_STEP + (hash2(c + 91, r) - 0.5) * JITTER_Y,
-        dur:   6.4 + hash2(c + 17, r + 5) * 3.4,
-        delay:       hash2(c + 43, r + 9) * 4.5,
-        project: PROJECT_AT[residue] % N
-      });
-    }
+  const slots = layoutSlots();
+  const map = buildProjectMap(slots, N);
+  for (const s of slots) {
+    const residue = ((s.c + WIN_COLS * s.r) % N + N) % N;
+    s.project = map[residue];
   }
   return slots;
 }
 
-let TILE_SLOTS = composeTile();
+/* ── Filter ──
+   Two buckets, and every project sits in exactly one. Changing the filter
+   re-lays the canvas rather than hiding cards, so the grid stays evenly
+   covered and the block sizing stays matched to how many projects are left. */
+const FILTERS = {
+  all:     { label: 'All',     match: () => true },
+  product: { label: 'Product', match: p => p.category === 'product' },
+  brand:   { label: 'Brand',   match: p => p.category === 'brand'   }
+};
+
+let activeFilter = 'all';
+let ACTIVE = WORK.slice();
+let TILE_SLOTS = [];
+
+function relayout() {
+  ACTIVE = WORK.filter(FILTERS[activeFilter].match);
+  if (!ACTIVE.length) { console.error(`Filter "${activeFilter}" matches no projects.`); return; }
+  computeGeometry(ACTIVE.length);
+  TILE_SLOTS = composeTile(ACTIVE);
+}
 
 if (!WORK.length) console.error('WORK is empty — the canvas will render nothing.');
+relayout();
 
 function makeAura(src) {
   const aura = document.createElement('div');
@@ -740,7 +835,7 @@ function buildArtboard() {
       const oy = row * TILE_H;
       TILE_SLOTS.forEach(slot => {
         artboard.append(
-          makeWorkItem(WORK[slot.project], ox + slot.x, oy + slot.y, slot));
+          makeWorkItem(ACTIVE[slot.project], ox + slot.x, oy + slot.y, slot));
       });
     }
   }
@@ -1055,22 +1150,62 @@ buildArtboard();
 centerCanvas();
 wrapEdges();
 
-/* Spacing is derived from the window, so a resize has to re-lay the canvas —
-   otherwise a window dragged wider starts fitting more cards than there are
-   projects and the same project can appear twice on screen. */
+/* Re-lay the canvas from scratch — used by the filter and by resize. Spacing is
+   derived from the window, so a window dragged wider would otherwise start
+   fitting more cards than there are projects and repeat one on screen. */
+function rebuild() {
+  relayout();
+  artboard.innerHTML = '';
+  buildArtboard();
+  centerCanvas();
+  wrapEdges();
+  applyTransform();
+}
+
 let resizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
     if (modalOverlay.classList.contains('open')) return;   // don't yank the canvas mid-read
-    computeGeometry();
-    TILE_SLOTS = composeTile();
-    artboard.innerHTML = '';
-    buildArtboard();
-    centerCanvas();
-    wrapEdges();
+    rebuild();
   }, 250);
 });
+
+/* ── Filter pill ── */
+const filterPill = document.getElementById('filter');
+
+if (filterPill) {
+  const buttons = [...filterPill.querySelectorAll('.filter-btn')];
+  const thumb   = filterPill.querySelector('.filter-thumb');
+
+  // Slide the glass thumb under whichever option is live.
+  function moveThumb(btn, animate = true) {
+    thumb.style.transition = animate ? '' : 'none';
+    thumb.style.width     = btn.offsetWidth + 'px';
+    thumb.style.transform = `translateX(${btn.offsetLeft}px)`;
+    if (!animate) requestAnimationFrame(() => { thumb.style.transition = ''; });
+  }
+
+  buttons.forEach(btn => btn.addEventListener('click', () => {
+    if (btn.dataset.filter === activeFilter) return;
+    activeFilter = btn.dataset.filter;
+    buttons.forEach(b => b.classList.toggle('active', b === btn));
+    moveThumb(btn);
+
+    // Fade the canvas out, swap underneath, fade back — the rebuild is a full
+    // re-lay, so without this it snaps.
+    artboard.classList.add('swapping');
+    setTimeout(() => {
+      rebuild();
+      requestAnimationFrame(() => artboard.classList.remove('swapping'));
+    }, 220);
+  }));
+
+  moveThumb(buttons.find(b => b.dataset.filter === activeFilter), false);
+  window.addEventListener('resize', () => {
+    moveThumb(filterPill.querySelector('.filter-btn.active'), false);
+  });
+}
 
 // backdrop-filter on the blur-overlay won't pick up will-change:transform
 // layers until their transform is updated at least once. Force it.
