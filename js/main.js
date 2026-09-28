@@ -49,15 +49,21 @@ function computeGeometry(n) {
   const mobile = vw <= MOBILE_MAX;
 
   // A 280px card eats three quarters of a phone screen, so shrink it there.
-  CARD_W = mobile ? 190 : 280;
+  // Both axes are published to CSS: the card must not keep a desktop height
+  // while the maths plans around a smaller one.
+  CARD_W = mobile ? 185 : 280;
   CARD_H = Math.round(CARD_W * 0.75);
   document.documentElement.style.setProperty('--card-w', CARD_W + 'px');
+  document.documentElement.style.setProperty('--card-h', CARD_H + 'px');
 
+  /* Clear space that must survive the jitter. Generous on phones: the aura
+     glow bleeds well past the card edge, so cards read as touching long before
+     they actually do. */
   const spread = mobile ? SPREAD_MOBILE : SPREAD_WIDE;
-  const gapX   = mobile ? 40 : 60;    // clear space that must survive the jitter
-  const gapY   = mobile ? 40 : 60;
-  const driftX = mobile ? 40 : JITTER_MAX_X;   // drift we want, if there is room
-  const driftY = mobile ? 60 : JITTER_MAX_Y;
+  const gapX   = mobile ? 78 : 60;
+  const gapY   = mobile ? 78 : 60;
+  const driftX = mobile ? 34 : JITTER_MAX_X;   // drift we want, if there is room
+  const driftY = mobile ? 48 : JITTER_MAX_Y;
 
   [WIN_COLS, WIN_ROWS] = blockFor(n);
 
