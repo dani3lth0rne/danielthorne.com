@@ -185,10 +185,39 @@ html, body {
       0 4px 16px rgba(120, 104, 84, 0.20);
   }
 
-  /* The aura bleeds 56px past the card and is blurred another 36px, which makes
-     neighbours look joined on a small screen long before they touch. */
-  .card-aura { inset: -30px; filter: blur(22px) saturate(1.7) opacity(0.44); }
-  .item-card:hover .card-aura { filter: blur(22px) saturate(1.9) opacity(0.52); }
+  /* Aura scaled to the smaller card rather than cut back: it is what bleeds the
+     artwork into the canvas, so the cards read as part of the surface instead
+     of as pasted-on rectangles. The 78px gap carries the separation now, so
+     this no longer has to. */
+  .card-aura { inset: -48px; filter: blur(32px) saturate(1.8) opacity(0.58); }
+  .item-card:hover .card-aura { filter: blur(28px) saturate(2) opacity(0.66); }
+
+  /* On desktop the cursor lens blurs everything it isn't pointing at, which is
+     what dissolves the frames into the canvas. Phones have no cursor and the
+     view is deliberately sharp, so the card has to do that work itself: the
+     falloff starts earlier and runs longer, leaving no rectangle edge at all.
+     Many thumbnails carry their own white or coloured backplate, and this is
+     what stops those reading as pasted-on squares. */
+  .card-img {
+    -webkit-mask-image: radial-gradient(
+      ellipse 74% 72% at 50% 50%,
+      black 0%,
+      rgba(0, 0, 0, 0.94) 26%,
+      rgba(0, 0, 0, 0.66) 46%,
+      rgba(0, 0, 0, 0.32) 64%,
+      rgba(0, 0, 0, 0.10) 82%,
+      transparent 100%
+    );
+    mask-image: radial-gradient(
+      ellipse 74% 72% at 50% 50%,
+      black 0%,
+      rgba(0, 0, 0, 0.94) 26%,
+      rgba(0, 0, 0, 0.66) 46%,
+      rgba(0, 0, 0, 0.32) 64%,
+      rgba(0, 0, 0, 0.10) 82%,
+      transparent 100%
+    );
+  }
 }
 
 /* Phone chrome: a centred pill collides with the wordmark on a narrow screen,
