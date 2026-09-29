@@ -191,66 +191,11 @@ html, body {
       0 4px 16px rgba(120, 104, 84, 0.20);
   }
 
-  /* THE squares. .card-aura clips a blurred copy of the thumbnail with
-     overflow:hidden, so any thumbnail carrying a large flat background becomes
-     a big rectangle of colour with a straight edge. Desktop's cursor lens
-     smears that away; a sharp phone view does not. Mask the glow to an ellipse
-     so it falls off in every direction and has no box to see. */
-  body .card-aura {
-    inset: -40px;
-    filter: blur(30px) saturate(1.7) opacity(0.46);
-    -webkit-mask-image: radial-gradient(
-      ellipse 50% 50% at 50% 50%,
-      black 0%,
-      rgba(0, 0, 0, 0.72) 42%,
-      rgba(0, 0, 0, 0.32) 68%,
-      rgba(0, 0, 0, 0.08) 86%,
-      transparent 100%
-    );
-    mask-image: radial-gradient(
-      ellipse 50% 50% at 50% 50%,
-      black 0%,
-      rgba(0, 0, 0, 0.72) 42%,
-      rgba(0, 0, 0, 0.32) 68%,
-      rgba(0, 0, 0, 0.08) 86%,
-      transparent 100%
-    );
-  }
+  /* Aura scaled to the smaller card. It needs no mask of its own: the lens
+     blurs whatever is not at the centre, which is what hides its box — same as
+     desktop. */
+  body .card-aura { inset: -40px; filter: blur(30px) saturate(1.8) opacity(0.5); }
   body .item-card:hover .card-aura { filter: blur(28px) saturate(1.9) opacity(0.56); }
-
-  /* On desktop the cursor lens blurs everything it isn't pointing at, which is
-     what dissolves the frames into the canvas. Phones have no cursor and the
-     view is deliberately sharp, so the card has to do that work itself: the
-     falloff starts earlier and runs longer, leaving no rectangle edge at all.
-     Many thumbnails carry their own white or coloured backplate, and this is
-     what stops those reading as pasted-on squares. */
-  /* Two things have to be true at once: no visible edge, and the thumbnail
-     still readable. In a radial-gradient a percentage radius is measured
-     against the whole box, not the half-box, so the edge of the image sits at
-     t = 0.5 / radius along the ramp — here 0.5/0.65 = 0.77. Ending the ramp at
-     77% therefore puts alpha at zero exactly on the edge while leaving the
-     middle 60% of the picture untouched. (A 50% radius also hits zero, but it
-     only keeps 38% solid, which cropped the featured artwork.) */
-  body .card-img {
-    -webkit-mask-image: radial-gradient(
-      ellipse 65% 65% at 50% 50%,
-      black 0%,
-      black 46%,
-      rgba(0, 0, 0, 0.94) 56%,
-      rgba(0, 0, 0, 0.66) 65%,
-      rgba(0, 0, 0, 0.30) 71%,
-      transparent 77%
-    );
-    mask-image: radial-gradient(
-      ellipse 65% 65% at 50% 50%,
-      black 0%,
-      black 46%,
-      rgba(0, 0, 0, 0.94) 56%,
-      rgba(0, 0, 0, 0.66) 65%,
-      rgba(0, 0, 0, 0.30) 71%,
-      transparent 77%
-    );
-  }
 }
 
 /* Phone chrome: a centred pill collides with the wordmark on a narrow screen,
@@ -426,29 +371,22 @@ body.modal-open .artboard-wrap {
   transition: opacity 0.6s ease;
 }
 
-/* Phones get an edge vignette rather than a lens: everything in view is sharp,
-   and only the outer margin softens so the canvas feels like it continues past
-   the screen. Deliberately ignores --cx/--cy — there is no cursor to follow,
-   and letting a stray pointer position leak in is what left the whole screen
-   blurred. */
-@media (max-width: 640px) {
+/* Phones use the same cursor lens as desktop — that lens is exactly what keeps
+   desktop looking right, because it softens everything you are not looking at
+   and no card edge ever has to survive on its own. A phone has no cursor, so
+   the middle of the screen becomes one: centreLens() pins --cx/--cy there, the
+   card you have dragged to the centre stays fully sharp, and everything around
+   it falls away. Radii are scaled to a phone so a whole card fits the clear
+   spot. */
+@media (max-width: 700px) {
   .blur-overlay {
-    backdrop-filter: blur(26px) saturate(0.72) brightness(1.02);
-    -webkit-backdrop-filter: blur(26px) saturate(0.72) brightness(1.02);
-    -webkit-mask-image: radial-gradient(
-      ellipse 96% 88% at 50% 50%,
-      transparent 0%,
-      transparent 68%,
-      rgba(0, 0, 0, 0.42) 87%,
-      black 100%
-    );
-    mask-image: radial-gradient(
-      ellipse 96% 88% at 50% 50%,
-      transparent 0%,
-      transparent 68%,
-      rgba(0, 0, 0, 0.42) 87%,
-      black 100%
-    );
+    --lens-clear: 132px;
+    --lens-1: 178px;
+    --lens-2: 240px;
+    --lens-3: 318px;
+    --lens-4: 400px;
+    backdrop-filter: blur(48px) saturate(0.6) brightness(1.03);
+    -webkit-backdrop-filter: blur(48px) saturate(0.6) brightness(1.03);
   }
 }
 
