@@ -482,13 +482,13 @@ const WORK = [
     client: 'ADV', date: '2024', type: 'Brand Identity',
     role: 'Brand design lead',
     description: 'ADV builds premium, functional tennis gear for players dedicated to a lifetime of play. The brand needed to sit next to the heritage names on a pro-shop wall without borrowing any of their language — daring, experimental, and unmistakably its own.',
-    thumb: 'images/adv-mission.jpg',
-    hero:  'images/adv-logo.jpg',
+    thumb: 'images/adv-cover.jpg',
+    hero:  'images/adv-cover.jpg',
     liveUrl: 'https://danielthorne.com/projects/adv',
-    tags: ['Brand Identity', 'Sport', 'Social System'],
+    tags: ['Brand Identity', 'Sport', 'Campaign'],
     blocks: [
       { kind: 'media', layout: 'full', items: [
-        { src: 'images/adv-logo.jpg', caption: 'Identity' } ] },
+        { src: 'images/adv-cover.jpg', caption: 'Advantage, you' } ] },
 
       { kind: 'text', label: '01 — Vision & mission',
         heading: 'A brand for a lifetime of play',
@@ -508,12 +508,39 @@ const WORK = [
         { src: 'images/adv-guide.jpg', caption: 'Logo rules' },
         { src: 'images/adv-type.jpg',  caption: 'Type scale' } ] },
 
-      { kind: 'text', label: '03 — Social',
+      { kind: 'text', label: '03 — Graphic language',
+        heading: 'A marker in the hand of the brand',
+        body: ['The device that carries the whole system is a hand-drawn spring-green mark: a circle around the word that matters, a strikethrough on the one it replaces, a rule under the claim. It puts a player’s handwriting over a photograph, which is the fastest way to sound like a crew rather than a committee.',
+               'Alongside it sits an organic cut-out — photography masked into a hand-torn shape rather than a rectangle — so imagery never arrives as a neat tile.'] },
+
+      { kind: 'media', layout: 'trio', items: [
+        { src: 'images/adv-camp-1.jpg', caption: 'Made by players' },
+        { src: 'images/adv-camp-2.jpg', caption: 'Daring, innovative' },
+        { src: 'images/adv-camp-3.jpg', caption: 'Functional' } ] },
+
+      { kind: 'media', layout: 'inset', items: [
+        { src: 'images/adv-cutout.jpg', caption: 'Organic photo mask' } ] },
+
+      { kind: 'text', label: '04 — Launch',
+        heading: 'Taking the JetPack to market',
+        body: 'Brand-side work for the JetPack Pro launch — art direction on the product photography, the retail and promotional layouts, and the social cut-downs. The bag itself is ADV’s engineering; everything here is how it was dressed and sold.' },
+
+      { kind: 'media', layout: 'pair', items: [
+        { src: 'images/adv-retail-a.jpg', caption: 'Promotional' },
+        { src: 'images/adv-retail-b.jpg', caption: 'Retail' } ] },
+
+      { kind: 'media', layout: 'inset', items: [
+        { src: 'images/adv-bag.jpg', caption: 'Product art direction' } ] },
+
+      { kind: 'text', label: '05 — Social',
         heading: 'Templates that survive contact with a feed',
         body: 'A kit of post formats — pill labels, outlined type lockups, organic photo masks and vertical location rules — that let the team produce a month of content in an afternoon and still look like one brand.' },
 
       { kind: 'media', layout: 'full', items: [
         { src: 'images/adv-social.png', float: true, caption: 'Instagram templates' } ] },
+
+      { kind: 'media', layout: 'full', items: [
+        { src: 'images/adv-social-product.png', float: true, caption: 'Launch and campaign posts' } ] },
 
       { kind: 'media', layout: 'inset', items: [
         { src: 'images/adv-contents.jpg', caption: 'Brand book' } ] }
