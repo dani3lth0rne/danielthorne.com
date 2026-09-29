@@ -380,13 +380,22 @@ body.modal-open .artboard-wrap {
    spot. */
 @media (max-width: 700px) {
   .blur-overlay {
-    --lens-clear: 132px;
-    --lens-1: 178px;
-    --lens-2: 240px;
-    --lens-3: 318px;
-    --lens-4: 400px;
-    backdrop-filter: blur(48px) saturate(0.6) brightness(1.03);
-    -webkit-backdrop-filter: blur(48px) saturate(0.6) brightness(1.03);
+    /* Scaled by the card ratio (185/280 = 0.66) so the lens sits in exactly the
+       same relation to a card as it does on desktop.
+
+       This is the whole trick, and getting it wrong is what produced visible
+       boxes: desktop's clear radius is 90px against a 280px card, i.e. only
+       0.32 of a card, so a card is always WIDER than the sharp spot and its own
+       edges necessarily fall in the blurred ring. A phone clear radius of 132px
+       against a 185px card was 0.71 of a card — the whole thing fitted inside
+       the sharp circle, so every edge rendered crisp. */
+    --lens-clear: 59px;
+    --lens-1: 99px;
+    --lens-2: 159px;
+    --lens-3: 238px;
+    --lens-4: 317px;
+    backdrop-filter: blur(53px) saturate(0.55) brightness(1.04);
+    -webkit-backdrop-filter: blur(53px) saturate(0.55) brightness(1.04);
   }
 }
 
