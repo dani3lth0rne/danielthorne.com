@@ -224,30 +224,31 @@ html, body {
      falloff starts earlier and runs longer, leaving no rectangle edge at all.
      Many thumbnails carry their own white or coloured backplate, and this is
      what stops those reading as pasted-on squares. */
-  /* Radii must be 50%, not 74%. In a radial-gradient a percentage radius is
-     measured against the whole box, so 74% is 1.48x the half-width — the ramp
-     never finishes before the image ends and the edge was still painting at
-     28% alpha. That residue is the container you could see. At 50% the
-     gradient lands exactly on the edge midpoints, so it reaches zero there and
-     the corners fall outside it entirely. */
+  /* Two things have to be true at once: no visible edge, and the thumbnail
+     still readable. In a radial-gradient a percentage radius is measured
+     against the whole box, not the half-box, so the edge of the image sits at
+     t = 0.5 / radius along the ramp — here 0.5/0.65 = 0.77. Ending the ramp at
+     77% therefore puts alpha at zero exactly on the edge while leaving the
+     middle 60% of the picture untouched. (A 50% radius also hits zero, but it
+     only keeps 38% solid, which cropped the featured artwork.) */
   body .card-img {
     -webkit-mask-image: radial-gradient(
-      ellipse 50% 50% at 50% 50%,
+      ellipse 65% 65% at 50% 50%,
       black 0%,
-      black 38%,
-      rgba(0, 0, 0, 0.86) 55%,
-      rgba(0, 0, 0, 0.48) 72%,
-      rgba(0, 0, 0, 0.16) 88%,
-      transparent 100%
+      black 46%,
+      rgba(0, 0, 0, 0.94) 56%,
+      rgba(0, 0, 0, 0.66) 65%,
+      rgba(0, 0, 0, 0.30) 71%,
+      transparent 77%
     );
     mask-image: radial-gradient(
-      ellipse 50% 50% at 50% 50%,
+      ellipse 65% 65% at 50% 50%,
       black 0%,
-      black 38%,
-      rgba(0, 0, 0, 0.86) 55%,
-      rgba(0, 0, 0, 0.48) 72%,
-      rgba(0, 0, 0, 0.16) 88%,
-      transparent 100%
+      black 46%,
+      rgba(0, 0, 0, 0.94) 56%,
+      rgba(0, 0, 0, 0.66) 65%,
+      rgba(0, 0, 0, 0.30) 71%,
+      transparent 77%
     );
   }
 }
