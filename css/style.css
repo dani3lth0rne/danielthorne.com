@@ -191,11 +191,36 @@ html, body {
       0 4px 16px rgba(120, 104, 84, 0.20);
   }
 
-  /* Aura scaled to the smaller card. It needs no mask of its own: the lens
-     blurs whatever is not at the centre, which is what hides its box — same as
-     desktop. */
-  body .card-aura { inset: -40px; filter: blur(30px) saturate(1.8) opacity(0.5); }
-  body .item-card:hover .card-aura { filter: blur(28px) saturate(1.9) opacity(0.56); }
+  /* The colour behind the photo — and the box you can see. .card-aura clips a
+     blurred copy of the thumbnail with overflow:hidden, so on its own it is a
+     rectangle of colour with four straight sides. Blurring it does not help:
+     the clip happens first, so the blur just softens a rectangle.
+
+     Masking it to an ellipse whose radii are 50% (the gradient then reaching
+     zero exactly on the edge midpoints, with the corners falling outside it
+     entirely) leaves a glow with no sides at all — an orb around the photo
+     rather than a panel behind it. */
+  body .card-aura {
+    inset: -46px;
+    filter: blur(34px) saturate(1.85) opacity(0.52);
+    -webkit-mask-image: radial-gradient(
+      ellipse 50% 50% at 50% 50%,
+      black 0%,
+      rgba(0, 0, 0, 0.88) 32%,
+      rgba(0, 0, 0, 0.52) 56%,
+      rgba(0, 0, 0, 0.20) 76%,
+      transparent 100%
+    );
+    mask-image: radial-gradient(
+      ellipse 50% 50% at 50% 50%,
+      black 0%,
+      rgba(0, 0, 0, 0.88) 32%,
+      rgba(0, 0, 0, 0.52) 56%,
+      rgba(0, 0, 0, 0.20) 76%,
+      transparent 100%
+    );
+  }
+  body .item-card:hover .card-aura { filter: blur(30px) saturate(2) opacity(0.6); }
 }
 
 /* Phone chrome: a centred pill collides with the wordmark on a narrow screen,
