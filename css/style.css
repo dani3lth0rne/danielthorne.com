@@ -166,14 +166,20 @@ html, body {
 @media (max-width: 700px) {
   .modal-overlay .modal-frame { padding: 68px 20px 64px; }
 
-  .modal-controls {
+  /* NOTE: these five carry a `body ` prefix on purpose. Their base rules are
+     defined further down the file, and a media query adds no specificity — so
+     at equal specificity the later base rule wins and every override here was
+     being silently discarded. The prefix (0,1,1 vs 0,1,0) makes them stick
+     regardless of order. The .chrome/.wordmark/.filter rules below need no
+     prefix: their base rules appear above this block. */
+  body .modal-controls {
     position: fixed;
     top: 12px;
     right: 12px;
     margin-bottom: 0;
     z-index: 210;
   }
-  .modal-ctrl-btn {
+  body .modal-ctrl-btn {
     width: 38px;
     height: 38px;
     /* Reads against whatever scrolls under it. */
@@ -190,27 +196,27 @@ html, body {
      a big rectangle of colour with a straight edge. Desktop's cursor lens
      smears that away; a sharp phone view does not. Mask the glow to an ellipse
      so it falls off in every direction and has no box to see. */
-  .card-aura {
+  body .card-aura {
     inset: -40px;
     filter: blur(30px) saturate(1.7) opacity(0.46);
     -webkit-mask-image: radial-gradient(
-      ellipse 64% 62% at 50% 50%,
+      ellipse 50% 50% at 50% 50%,
       black 0%,
-      rgba(0, 0, 0, 0.78) 38%,
-      rgba(0, 0, 0, 0.36) 66%,
-      rgba(0, 0, 0, 0.10) 84%,
+      rgba(0, 0, 0, 0.72) 42%,
+      rgba(0, 0, 0, 0.32) 68%,
+      rgba(0, 0, 0, 0.08) 86%,
       transparent 100%
     );
     mask-image: radial-gradient(
-      ellipse 64% 62% at 50% 50%,
+      ellipse 50% 50% at 50% 50%,
       black 0%,
-      rgba(0, 0, 0, 0.78) 38%,
-      rgba(0, 0, 0, 0.36) 66%,
-      rgba(0, 0, 0, 0.10) 84%,
+      rgba(0, 0, 0, 0.72) 42%,
+      rgba(0, 0, 0, 0.32) 68%,
+      rgba(0, 0, 0, 0.08) 86%,
       transparent 100%
     );
   }
-  .item-card:hover .card-aura { filter: blur(28px) saturate(1.9) opacity(0.56); }
+  body .item-card:hover .card-aura { filter: blur(28px) saturate(1.9) opacity(0.56); }
 
   /* On desktop the cursor lens blurs everything it isn't pointing at, which is
      what dissolves the frames into the canvas. Phones have no cursor and the
@@ -218,23 +224,29 @@ html, body {
      falloff starts earlier and runs longer, leaving no rectangle edge at all.
      Many thumbnails carry their own white or coloured backplate, and this is
      what stops those reading as pasted-on squares. */
-  .card-img {
+  /* Radii must be 50%, not 74%. In a radial-gradient a percentage radius is
+     measured against the whole box, so 74% is 1.48x the half-width — the ramp
+     never finishes before the image ends and the edge was still painting at
+     28% alpha. That residue is the container you could see. At 50% the
+     gradient lands exactly on the edge midpoints, so it reaches zero there and
+     the corners fall outside it entirely. */
+  body .card-img {
     -webkit-mask-image: radial-gradient(
-      ellipse 74% 72% at 50% 50%,
+      ellipse 50% 50% at 50% 50%,
       black 0%,
-      rgba(0, 0, 0, 0.94) 26%,
-      rgba(0, 0, 0, 0.66) 46%,
-      rgba(0, 0, 0, 0.32) 64%,
-      rgba(0, 0, 0, 0.10) 82%,
+      black 38%,
+      rgba(0, 0, 0, 0.86) 55%,
+      rgba(0, 0, 0, 0.48) 72%,
+      rgba(0, 0, 0, 0.16) 88%,
       transparent 100%
     );
     mask-image: radial-gradient(
-      ellipse 74% 72% at 50% 50%,
+      ellipse 50% 50% at 50% 50%,
       black 0%,
-      rgba(0, 0, 0, 0.94) 26%,
-      rgba(0, 0, 0, 0.66) 46%,
-      rgba(0, 0, 0, 0.32) 64%,
-      rgba(0, 0, 0, 0.10) 82%,
+      black 38%,
+      rgba(0, 0, 0, 0.86) 55%,
+      rgba(0, 0, 0, 0.48) 72%,
+      rgba(0, 0, 0, 0.16) 88%,
       transparent 100%
     );
   }
