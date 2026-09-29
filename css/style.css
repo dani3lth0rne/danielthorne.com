@@ -185,12 +185,32 @@ html, body {
       0 4px 16px rgba(120, 104, 84, 0.20);
   }
 
-  /* Aura scaled to the smaller card rather than cut back: it is what bleeds the
-     artwork into the canvas, so the cards read as part of the surface instead
-     of as pasted-on rectangles. The 78px gap carries the separation now, so
-     this no longer has to. */
-  .card-aura { inset: -48px; filter: blur(32px) saturate(1.8) opacity(0.58); }
-  .item-card:hover .card-aura { filter: blur(28px) saturate(2) opacity(0.66); }
+  /* THE squares. .card-aura clips a blurred copy of the thumbnail with
+     overflow:hidden, so any thumbnail carrying a large flat background becomes
+     a big rectangle of colour with a straight edge. Desktop's cursor lens
+     smears that away; a sharp phone view does not. Mask the glow to an ellipse
+     so it falls off in every direction and has no box to see. */
+  .card-aura {
+    inset: -40px;
+    filter: blur(30px) saturate(1.7) opacity(0.46);
+    -webkit-mask-image: radial-gradient(
+      ellipse 64% 62% at 50% 50%,
+      black 0%,
+      rgba(0, 0, 0, 0.78) 38%,
+      rgba(0, 0, 0, 0.36) 66%,
+      rgba(0, 0, 0, 0.10) 84%,
+      transparent 100%
+    );
+    mask-image: radial-gradient(
+      ellipse 64% 62% at 50% 50%,
+      black 0%,
+      rgba(0, 0, 0, 0.78) 38%,
+      rgba(0, 0, 0, 0.36) 66%,
+      rgba(0, 0, 0, 0.10) 84%,
+      transparent 100%
+    );
+  }
+  .item-card:hover .card-aura { filter: blur(28px) saturate(1.9) opacity(0.56); }
 
   /* On desktop the cursor lens blurs everything it isn't pointing at, which is
      what dissolves the frames into the canvas. Phones have no cursor and the
