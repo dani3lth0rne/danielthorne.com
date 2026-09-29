@@ -20,7 +20,7 @@ const JITTER_MAX_Y = 100;
    slots a screen spans, so the no-repeat guarantee still holds. Phones stay at
    1 so the work sits close together and you needn't drag far to find the next. */
 const SPREAD_WIDE   = 1.28;
-const SPREAD_MOBILE = 1.0;
+const SPREAD_MOBILE = 0.98;
 const MOBILE_MAX    = 640;
 
 /* All of this is recomputed whenever the filter or the window changes, because
@@ -60,8 +60,8 @@ function computeGeometry(n) {
      glow bleeds well past the card edge, so cards read as touching long before
      they actually do. */
   const spread = mobile ? SPREAD_MOBILE : SPREAD_WIDE;
-  const gapX   = mobile ? 78 : 60;
-  const gapY   = mobile ? 78 : 60;
+  const gapX   = mobile ? 66 : 60;
+  const gapY   = mobile ? 66 : 60;
   const driftX = mobile ? 34 : JITTER_MAX_X;   // drift we want, if there is room
   const driftY = mobile ? 48 : JITTER_MAX_Y;
 
